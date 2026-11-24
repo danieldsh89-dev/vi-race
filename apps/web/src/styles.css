@@ -1400,3 +1400,25 @@ footer span {
     scroll-behavior: auto !important;
   }
 }
+.radar-group {
+  margin-top: 24px;
+  font-size: 0.95rem;
+}
+.radar-group > summary {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.signals {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.project-card .hash {
+  overflow-wrap: anywhere;
+}
+.reference {
+  display: block;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}

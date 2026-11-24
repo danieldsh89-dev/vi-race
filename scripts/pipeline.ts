@@ -20,7 +20,11 @@ import {
   validateAssessment,
 } from "@vi/domain";
 import { declaredFork } from "@vi/dna";
-import { mergeCandidates, applyCandidateReview } from "@vi/radar";
+import {
+  mergeCandidates,
+  applyCandidateReview,
+  duplicationSignals,
+} from "@vi/radar";
 import {
   checksum,
   insert,
@@ -606,7 +610,7 @@ export async function buildPublication(
     mode: "normal",
     data: {
       projects: rankProjects(views),
-      candidates,
+      candidates: duplicationSignals(candidates),
       sources,
       rubric: c.rubric,
       events: events
@@ -798,7 +802,9 @@ export async function runCycle(
           "discovery_candidates",
         ),
         old = candidates.find((c) => c.id === review.candidate_id);
-      if (!old) throw new Error("Candidato de revisión inexistente");
+      // La decisión se aplica cuando el candidato exista en esta base; una base
+      // nueva o restaurada sin ese candidato no debe bloquear el ciclo.
+      if (!old) continue;
       const candidate = applyCandidateReview(
         old,
         review,

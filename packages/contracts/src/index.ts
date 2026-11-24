@@ -34,6 +34,12 @@ export const ProjectSchema = z
     maintenance_status: z.enum(["active", "archived", "unknown", "inactive"]),
     ranking_eligible: z.boolean(),
     official_url: safeUrl.nullable(),
+    /**
+     * Política de enlaces. Sin valor equivale a "text_only": el proyecto se
+     * rastrea y sus URL se muestran como texto, sin hipervínculos. "link" exige
+     * que una revisión haya comprobado que no depende de material filtrado.
+     */
+    link_policy: z.enum(["link", "text_only"]).optional(),
     created_at: utc,
     updated_at: utc,
     synthetic: z.boolean().optional(),
@@ -179,7 +185,15 @@ export interface Candidate {
   reason: string;
   linked_project_id: string | null;
   review_commit: string | null;
+  /** Señales deterministas calculadas al publicar; orientan la revisión, nunca deciden. */
+  signals?: CandidateSignal[];
 }
+export const candidateSignals = [
+  "repeated_name",
+  "repeated_description",
+  "profile_repository",
+] as const;
+export type CandidateSignal = (typeof candidateSignals)[number];
 export interface Relation {
   id: string;
   from_project_id: string;

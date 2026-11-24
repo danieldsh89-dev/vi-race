@@ -34,7 +34,12 @@ import {
   WifiOff,
   X,
 } from "lucide-react";
-import type { ProjectView, Publication } from "@vi/contracts";
+import type {
+  Candidate,
+  CandidateSignal,
+  ProjectView,
+  Publication,
+} from "@vi/contracts";
 import { freshness, globalHealth } from "@vi/domain";
 import { getPublication } from "./services";
 import { dateTime, labels } from "./text";
@@ -407,6 +412,34 @@ function External({
     </a>
   );
 }
+/** URL pública mostrada como texto, sin hipervínculo (política de enlaces). */
+function Reference({ url, label }: { url: string | null; label: string }) {
+  if (!url) return null;
+  return (
+    <small className="reference">
+      {label}: <span className="hash">{url}</span>
+    </small>
+  );
+}
+/** Enlaza solo si el proyecto tiene autorización expresa; si no, texto. */
+function ProjectLink({
+  url,
+  allowed,
+  children,
+}: {
+  url: string | null;
+  allowed: boolean;
+  children: string;
+}) {
+  return allowed ? (
+    <External url={url}>{children}</External>
+  ) : (
+    <Reference url={url} label={children} />
+  );
+}
+const linkable = (p: Publication, projectId: string | null) =>
+  !!projectId &&
+  p.data.projects.some((x) => x.id === projectId && x.link_policy === "link");
 function Tag({
   children,
   tone = "muted",
@@ -492,7 +525,7 @@ function Dashboard({ p, link }: Props) {
       0,
     ),
     pending = p.data.candidates.filter(
-      (c) => c.status === "pending_review",
+      (c) => c.status === "pending_review" && !c.signals?.length,
     ).length;
   return (
     <>
@@ -625,11 +658,12 @@ function Dashboard({ p, link }: Props) {
                 <p className="muted">
                   Actividad observada. No demuestra por sí sola una capacidad.
                 </p>
-                <External
+                <ProjectLink
                   url={typeof e.payload.url === "string" ? e.payload.url : null}
+                  allowed={linkable(p, e.project_id)}
                 >
-                  Ver fuente
-                </External>
+                  Fuente
+                </ProjectLink>
               </article>
             ))
           ) : (
@@ -839,9 +873,12 @@ function ProjectDetail({ p, link }: Props) {
           <Eyebrow>{labels.types[project.project_type]}</Eyebrow>
           <h1>{project.name}</h1>
           <p>{project.description}</p>
-          <External url={project.official_url}>
+          <ProjectLink
+            url={project.official_url}
+            allowed={project.link_policy === "link"}
+          >
             Fuente oficial del proyecto
-          </External>
+          </ProjectLink>
         </div>
         <div className="detail-score">
           {project.rank === null ? (
@@ -1006,9 +1043,12 @@ function ProjectDetail({ p, link }: Props) {
                 Cadena: {e.provenance_chain} · SHA-256:{" "}
                 <span className="hash">{e.content_hash}</span>
               </small>
-              <External url={e.permalink ?? e.url}>
-                Abrir material original
-              </External>
+              <ProjectLink
+                url={e.permalink ?? e.url}
+                allowed={project.link_policy === "link"}
+              >
+                Material original
+              </ProjectLink>
             </article>
           ))
         ) : (
@@ -1088,7 +1128,49 @@ function ProjectDetail({ p, link }: Props) {
     </>
   );
 }
+const signalLabels: Record<CandidateSignal, string> = {
+  repeated_name: "Mismo nombre de repositorio en varias cuentas",
+  repeated_description: "Descripción idéntica en varias cuentas",
+  profile_repository: "Repositorio de perfil de organización, sin código",
+};
+const statusLabels: Record<Candidate["status"], string> = {
+  pending_review: "Pendiente de revisión",
+  accepted: "Aceptado",
+  rejected: "Rechazado",
+  duplicate: "Duplicado",
+  deferred: "Aplazado",
+};
+function CandidateCard({ c }: { c: Candidate }) {
+  return (
+    <article className="project-card">
+      <Tag tone={c.signals?.length ? "muted" : "amber"}>
+        {statusLabels[c.status]}
+      </Tag>
+      <h2>{c.name}</h2>
+      <p>{c.description || "Sin descripción pública."}</p>
+      {c.signals?.length ? (
+        <ul className="signals">
+          {c.signals.map((s) => (
+            <li key={s}>{signalLabels[s]}</li>
+          ))}
+        </ul>
+      ) : null}
+      <p>{c.reason}</p>
+      <small>
+        Detectado: {dateTime(c.first_seen_at)} · Visto:{" "}
+        {dateTime(c.last_seen_at)}
+      </small>
+      <Reference url={c.canonical_url} label="Repositorio" />
+    </article>
+  );
+}
 function RadarPage({ p }: { p: Publication }) {
+  const pending = p.data.candidates.filter(
+      (c) => c.status === "pending_review",
+    ),
+    clean = pending.filter((c) => !c.signals?.length),
+    flagged = pending.filter((c) => c.signals?.length),
+    reviewed = p.data.candidates.filter((c) => c.status !== "pending_review");
   return (
     <>
       <PageTitle
@@ -1099,34 +1181,45 @@ function RadarPage({ p }: { p: Publication }) {
       <div className="notice subtle">
         Última búsqueda satisfactoria:{" "}
         {dateTime(p.data.discovery_last_success_at)}. La cobertura es limitada;
-        no se presupone exhaustividad.
+        no se presupone exhaustividad. VI Race rastrea estos repositorios sin
+        enlazarlos: muchos dependen de material filtrado o son reclamos. No
+        descargues ni ejecutes nada de ellos.
       </div>
       {p.data.candidates.length ? (
-        <div className="project-cards">
-          {p.data.candidates.map((c) => (
-            <article className="project-card" key={c.id}>
-              <Tag tone="amber">
-                {
-                  {
-                    pending_review: "Pendiente de revisión",
-                    accepted: "Aceptado",
-                    rejected: "Rechazado",
-                    duplicate: "Duplicado",
-                    deferred: "Aplazado",
-                  }[c.status]
-                }
-              </Tag>
-              <h2>{c.name}</h2>
-              <p>{c.description || "Sin descripción pública."}</p>
-              <p>{c.reason}</p>
-              <small>
-                Detectado: {dateTime(c.first_seen_at)} · Visto:{" "}
-                {dateTime(c.last_seen_at)}
-              </small>
-              <External url={c.canonical_url}>Consultar candidato</External>
-            </article>
-          ))}
-        </div>
+        <>
+          {clean.length ? (
+            <div className="project-cards">
+              {clean.map((c) => (
+                <CandidateCard c={c} key={c.id} />
+              ))}
+            </div>
+          ) : (
+            <Empty
+              title="Sin candidatos pendientes sin señales"
+              detail="Los resultados nuevos aparecerán aquí tras la próxima búsqueda programada."
+            />
+          )}
+          {flagged.length ? (
+            <details className="radar-group">
+              <summary>Posibles copias o reclamos ({flagged.length})</summary>
+              <div className="project-cards">
+                {flagged.map((c) => (
+                  <CandidateCard c={c} key={c.id} />
+                ))}
+              </div>
+            </details>
+          ) : null}
+          {reviewed.length ? (
+            <details className="radar-group">
+              <summary>Decisiones registradas ({reviewed.length})</summary>
+              <div className="project-cards">
+                {reviewed.map((c) => (
+                  <CandidateCard c={c} key={c.id} />
+                ))}
+              </div>
+            </details>
+          ) : null}
+        </>
       ) : (
         <Empty
           title="Radar todavía sin candidatos"
@@ -1293,7 +1386,12 @@ function Sources({ p, now }: { p: Publication; now: number }) {
                   fallidos
                 </p>
               )}
-              <External url={s.canonical_url}>Ver fuente</External>
+              <ProjectLink
+                url={s.canonical_url}
+                allowed={linkable(p, s.project_id)}
+              >
+                Fuente
+              </ProjectLink>
               <External url={s.terms_url}>Condiciones de acceso</External>
             </article>
           ))}
