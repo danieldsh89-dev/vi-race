@@ -179,7 +179,15 @@ export interface Candidate {
   reason: string;
   linked_project_id: string | null;
   review_commit: string | null;
+  /** Señales deterministas calculadas al publicar; orientan la revisión, nunca deciden. */
+  signals?: CandidateSignal[];
 }
+export const candidateSignals = [
+  "repeated_name",
+  "repeated_description",
+  "profile_repository",
+] as const;
+export type CandidateSignal = (typeof candidateSignals)[number];
 export interface Relation {
   id: string;
   from_project_id: string;

@@ -34,7 +34,12 @@ import {
   WifiOff,
   X,
 } from "lucide-react";
-import type { ProjectView, Publication } from "@vi/contracts";
+import type {
+  Candidate,
+  CandidateSignal,
+  ProjectView,
+  Publication,
+} from "@vi/contracts";
 import { freshness, globalHealth } from "@vi/domain";
 import { getPublication } from "./services";
 import { dateTime, labels } from "./text";
@@ -492,7 +497,7 @@ function Dashboard({ p, link }: Props) {
       0,
     ),
     pending = p.data.candidates.filter(
-      (c) => c.status === "pending_review",
+      (c) => c.status === "pending_review" && !c.signals?.length,
     ).length;
   return (
     <>
@@ -1088,7 +1093,53 @@ function ProjectDetail({ p, link }: Props) {
     </>
   );
 }
+const signalLabels: Record<CandidateSignal, string> = {
+  repeated_name: "Mismo nombre de repositorio en varias cuentas",
+  repeated_description: "Descripción idéntica en varias cuentas",
+  profile_repository: "Repositorio de perfil de organización, sin código",
+};
+const statusLabels: Record<Candidate["status"], string> = {
+  pending_review: "Pendiente de revisión",
+  accepted: "Aceptado",
+  rejected: "Rechazado",
+  duplicate: "Duplicado",
+  deferred: "Aplazado",
+};
+function CandidateCard({ c, linked }: { c: Candidate; linked: boolean }) {
+  return (
+    <article className="project-card">
+      <Tag tone={c.signals?.length ? "muted" : "amber"}>
+        {statusLabels[c.status]}
+      </Tag>
+      <h2>{c.name}</h2>
+      <p>{c.description || "Sin descripción pública."}</p>
+      {c.signals?.length ? (
+        <ul className="signals">
+          {c.signals.map((s) => (
+            <li key={s}>{signalLabels[s]}</li>
+          ))}
+        </ul>
+      ) : null}
+      <p>{c.reason}</p>
+      <small>
+        Detectado: {dateTime(c.first_seen_at)} · Visto:{" "}
+        {dateTime(c.last_seen_at)}
+      </small>
+      {linked ? (
+        <External url={c.canonical_url}>Consultar candidato</External>
+      ) : (
+        <small className="hash">{c.canonical_url}</small>
+      )}
+    </article>
+  );
+}
 function RadarPage({ p }: { p: Publication }) {
+  const pending = p.data.candidates.filter(
+      (c) => c.status === "pending_review",
+    ),
+    clean = pending.filter((c) => !c.signals?.length),
+    flagged = pending.filter((c) => c.signals?.length),
+    reviewed = p.data.candidates.filter((c) => c.status !== "pending_review");
   return (
     <>
       <PageTitle
@@ -1099,34 +1150,51 @@ function RadarPage({ p }: { p: Publication }) {
       <div className="notice subtle">
         Última búsqueda satisfactoria:{" "}
         {dateTime(p.data.discovery_last_success_at)}. La cobertura es limitada;
-        no se presupone exhaustividad.
+        no se presupone exhaustividad. Ningún candidato está verificado: no
+        descargues ni ejecutes nada de estos repositorios.
       </div>
       {p.data.candidates.length ? (
-        <div className="project-cards">
-          {p.data.candidates.map((c) => (
-            <article className="project-card" key={c.id}>
-              <Tag tone="amber">
-                {
-                  {
-                    pending_review: "Pendiente de revisión",
-                    accepted: "Aceptado",
-                    rejected: "Rechazado",
-                    duplicate: "Duplicado",
-                    deferred: "Aplazado",
-                  }[c.status]
-                }
-              </Tag>
-              <h2>{c.name}</h2>
-              <p>{c.description || "Sin descripción pública."}</p>
-              <p>{c.reason}</p>
-              <small>
-                Detectado: {dateTime(c.first_seen_at)} · Visto:{" "}
-                {dateTime(c.last_seen_at)}
-              </small>
-              <External url={c.canonical_url}>Consultar candidato</External>
-            </article>
-          ))}
-        </div>
+        <>
+          {clean.length ? (
+            <div className="project-cards">
+              {clean.map((c) => (
+                <CandidateCard c={c} linked key={c.id} />
+              ))}
+            </div>
+          ) : (
+            <Empty
+              title="Sin candidatos pendientes sin señales"
+              detail="Los resultados nuevos aparecerán aquí tras la próxima búsqueda programada."
+            />
+          )}
+          {flagged.length ? (
+            <details className="radar-group">
+              <summary>
+                Posibles copias o reclamos ({flagged.length}). Se muestran sin
+                enlace hasta su revisión.
+              </summary>
+              <div className="project-cards">
+                {flagged.map((c) => (
+                  <CandidateCard c={c} linked={false} key={c.id} />
+                ))}
+              </div>
+            </details>
+          ) : null}
+          {reviewed.length ? (
+            <details className="radar-group">
+              <summary>Decisiones registradas ({reviewed.length})</summary>
+              <div className="project-cards">
+                {reviewed.map((c) => (
+                  <CandidateCard
+                    c={c}
+                    linked={c.status === "accepted"}
+                    key={c.id}
+                  />
+                ))}
+              </div>
+            </details>
+          ) : null}
+        </>
       ) : (
         <Empty
           title="Radar todavía sin candidatos"

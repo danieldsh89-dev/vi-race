@@ -9,6 +9,7 @@ import {
   EvidenceSchema,
   SourceSchema,
   RubricSchema,
+  candidateSignals,
 } from "./index";
 const ScoreSchema = z
   .object({
@@ -85,6 +86,7 @@ export const CandidateSchema = z
       .string()
       .regex(/^[a-f0-9]{40}$/)
       .nullable(),
+    signals: z.array(z.enum(candidateSignals)).max(3).optional(),
   })
   .strict();
 export const PublicationSchema = z

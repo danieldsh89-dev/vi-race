@@ -1,5 +1,9 @@
 import { it, expect } from "vitest";
-import { mergeCandidates, applyCandidateReview } from "@vi/radar";
+import {
+  mergeCandidates,
+  applyCandidateReview,
+  duplicationSignals,
+} from "@vi/radar";
 import { declaredFork, validateRelations } from "@vi/dna";
 import { validateProposal, deterministicSummary } from "@vi/analyst";
 import { demoPublication } from "./fixtures/demo";
@@ -111,4 +115,39 @@ it("el analista rechaza IDs inventados y confirmaciones automáticas", () => {
     ),
   ).toThrow();
   expect(deterministicSummary("commit")).toContain("No confirma");
+});
+it("Radar marca copias y perfiles sin cambiar su estado", () => {
+  const make = (name: string, description = "Real project") => ({
+    ...candidate,
+    id: `c_${name.replace(/\W/g, "_")}`,
+    provider_repo_id: name,
+    name,
+    description,
+  });
+  const result = duplicationSignals([
+    make("a/GTA-6-Switch--PC-2026", "Installer hub"),
+    make("b/GTA-6-Switch--PC-2026", "Installer hub"),
+    make("c/GTA-6-Switch--PC-2045", "Installer hub"),
+    make("d/.github", "Launcher"),
+    make("e/victory", "An attempt"),
+    make("f/victory-macos", "An attempt"),
+  ]);
+  const signals = Object.fromEntries(result.map((c) => [c.name, c.signals]));
+  expect(signals["a/GTA-6-Switch--PC-2026"]).toEqual([
+    "repeated_name",
+    "repeated_description",
+  ]);
+  expect(signals["c/GTA-6-Switch--PC-2045"]).toContain("repeated_name");
+  expect(signals["d/.github"]).toEqual(["profile_repository"]);
+  expect(signals["e/victory"]).toBeUndefined();
+  expect(result.every((c) => c.status === candidate.status)).toBe(true);
+});
+it("una misma cuenta repetida no cuenta como varias", () => {
+  const same = ["x/clone", "x/clone-2026", "X/Clone"].map((name, i) => ({
+    ...candidate,
+    id: `s${i}`,
+    provider_repo_id: String(i),
+    name,
+  }));
+  expect(duplicationSignals(same).some((c) => c.signals)).toBe(false);
 });
