@@ -1422,3 +1422,355 @@ footer span {
   color: var(--muted);
   overflow-wrap: anywhere;
 }
+
+/* ---------- Carrera: dashboard de avances (vi-avance-v1) ---------- */
+.race-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: end;
+  padding: 36px 0 28px;
+}
+.race-hero h1 {
+  font-size: clamp(2rem, 4.4vw, 3.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  margin: 12px 0 14px;
+}
+.race-hero h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+.race-hero p {
+  color: var(--muted);
+  max-width: 60ch;
+  line-height: 1.6;
+}
+.race-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.kpi {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.kpi-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+.kpi-label svg {
+  color: var(--accent);
+}
+.kpi strong {
+  font-size: 1.9rem;
+  letter-spacing: -0.02em;
+}
+.kpi small {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.race-board {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.race-row {
+  display: grid;
+  grid-template-columns: 34px minmax(140px, 1.1fr) minmax(220px, 2fr) 170px 70px;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--panel-alt);
+  border: 1px solid transparent;
+}
+.race-row:hover {
+  border-color: var(--border);
+}
+.race-pos {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-weight: 700;
+}
+.race-row:first-child .race-pos {
+  color: var(--amber);
+}
+.race-name {
+  display: grid;
+  min-width: 0;
+}
+.race-name a {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.race-name a:hover,
+.race-name a:focus-visible {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.race-name small,
+.race-activity small,
+.race-step {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.race-progress {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.race-step b {
+  color: var(--text);
+}
+.race-activity {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+}
+.race-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: end;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.race-stars svg {
+  color: var(--amber);
+}
+.ladder-bar {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  height: 12px;
+}
+.ladder-bar.compact {
+  height: 8px;
+}
+.ladder-bar .seg {
+  border-radius: 3px;
+  background: var(--border);
+}
+.ladder-bar .seg.implied {
+  background: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+.ladder-bar .seg.on {
+  background: linear-gradient(90deg, var(--accent), var(--green));
+}
+.sparkline .bar {
+  fill: var(--green);
+}
+.sparkline .bar.zero {
+  fill: var(--border);
+}
+.ladder-legend summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 650;
+  font-size: 0.85rem;
+}
+.ladder-legend ol {
+  margin: 8px 0 0;
+  padding-left: 0;
+  list-style: none;
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: grid;
+  gap: 2px;
+}
+.ladder-legend b {
+  color: var(--text);
+}
+.timeline {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.timeline li,
+.ladder-detail li {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.timeline p {
+  margin: 0;
+}
+.timeline a {
+  color: var(--text);
+}
+.timeline blockquote,
+.ladder-detail blockquote {
+  margin: 6px 0;
+  padding: 6px 10px;
+  border-left: 3px solid var(--accent);
+  background: var(--panel-alt);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.timeline small,
+.ladder-detail small {
+  color: var(--muted);
+}
+.step-chip {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 26px;
+  border-radius: 7px;
+  font-weight: 800;
+  font-size: 0.78rem;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.step-chip.off {
+  background: var(--panel-alt);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.step-chip.s6,
+.step-chip.s7,
+.step-chip.s8 {
+  background: var(--green);
+  color: var(--bg);
+}
+.funnel {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.funnel-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 28px;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.85rem;
+}
+.funnel-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.funnel-label b {
+  color: var(--text);
+}
+.funnel-track {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.funnel-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+}
+.funnel-count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+.small {
+  font-size: 0.8rem;
+}
+.sub-head {
+  margin: 22px 0 8px;
+  font-size: 1rem;
+}
+.component-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.component-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+.component-list a {
+  color: var(--text);
+  font-weight: 650;
+}
+.ladder-detail {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  display: grid;
+  gap: 14px;
+}
+.ladder-detail li:not(.on) strong {
+  color: var(--muted);
+}
+.ladder-detail p {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+}
+.activity-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+@media (max-width: 1100px) {
+  .race-hero {
+    grid-template-columns: 1fr;
+  }
+  .race-row {
+    grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1.4fr) 60px;
+  }
+  .race-activity {
+    display: none;
+  }
+}
+@media (max-width: 780px) {
+  .race-row {
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    row-gap: 8px;
+  }
+  .race-progress {
+    grid-column: 1 / -1;
+  }
+  .race-stars {
+    grid-row: 1;
+    grid-column: 3;
+  }
+}
+@media (max-width: 480px) {
+  .race-kpis {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .kpi strong {
+    font-size: 1.5rem;
+  }
+  .funnel-row {
+    grid-template-columns: minmax(0, 1fr) 70px 24px;
+  }
+}

@@ -34,6 +34,10 @@ export const ProjectSchema = z
     maintenance_status: z.enum(["active", "archived", "unknown", "inactive"]),
     ranking_eligible: z.boolean(),
     official_url: safeUrl.nullable(),
+    /** gta_vi: proyecto dedicado; multi_title: prueba varios juegos. */
+    title_scope: z.enum(["gta_vi", "multi_title"]).optional(),
+    /** Formas en que el proyecto nombra GTA VI sin citarlo. */
+    gta_aliases: z.array(z.string().min(3).max(80)).max(5).optional(),
     /**
      * Política de enlaces. Sin valor equivale a "text_only": el proyecto se
      * rastrea y sus URL se muestran como texto, sin hipervínculos. "link" exige
@@ -141,6 +145,8 @@ export type Source = z.infer<typeof SourceSchema>;
 export interface SourceState {
   source_id: string;
   cursor: { since: string | null; head_sha: string | null };
+  /** ETag del README: evita descargarlo si no ha cambiado. */
+  readme_etag?: string | null;
   etag: string | null;
   last_modified: string | null;
   next_due_at: string;
@@ -171,6 +177,33 @@ export interface Repository {
   head_sha: string | null;
   archived: boolean;
   parent_id: string | null;
+  stats?: RepositoryStats;
+}
+export interface RepositoryStats {
+  stars: number;
+  forks: number;
+  language: string | null;
+  pushed_at: string | null;
+  created_at: string | null;
+  last_commit_at: string | null;
+  last_commit_message: string | null;
+}
+export type ProgressStepId =
+  "P1" | "P2" | "P3" | "P4" | "P5" | "P6" | "P7" | "P8";
+export interface ProgressSignalView {
+  step: ProgressStepId;
+  source_type: "readme" | "release" | "commit";
+  excerpt: string;
+  ref: string | null;
+  detected_at: string;
+  /** Ya figuraba en la primera lectura del proyecto: punto de partida, no novedad. */
+  baseline?: boolean;
+}
+export interface ProgressView {
+  ladder: "vi-avance-v1";
+  level: number;
+  steps: ProgressSignalView[];
+  updated_at: string | null;
 }
 export interface Candidate {
   id: string;
@@ -187,6 +220,15 @@ export interface Candidate {
   review_commit: string | null;
   /** Señales deterministas calculadas al publicar; orientan la revisión, nunca deciden. */
   signals?: CandidateSignal[];
+  /** Datos públicos del repositorio en el momento de la búsqueda. */
+  repo?: CandidateRepo;
+}
+export interface CandidateRepo {
+  stars: number;
+  size_kb: number;
+  language: string | null;
+  fork: boolean;
+  pushed_at: string | null;
 }
 export const candidateSignals = [
   "repeated_name",
@@ -244,6 +286,10 @@ export interface ProjectView extends Project {
   activity_30d: number;
   last_confirmed_at: string | null;
   rank: number | null;
+  progress: ProgressView;
+  stats: RepositoryStats | null;
+  /** Commits por día, últimos 14 días UTC, del más antiguo al más reciente. */
+  activity_daily: number[];
 }
 export interface SourceView extends Source {
   last_checked_at: string | null;
@@ -294,13 +340,13 @@ export const CandidateReviewSchema = z
 export type CandidateReview = z.infer<typeof CandidateReviewSchema>;
 export const BudgetsSchema = z
   .object({
-    max_projects: z.number().int().max(20).positive(),
+    max_projects: z.number().int().max(60).positive(),
     requests_per_cycle: z.number().int().max(100).positive(),
     max_payload_bytes: z.number().int().max(2000000).positive(),
     max_candidates: z.number().int().max(50).positive(),
     max_job_seconds: z.number().int().max(480).positive(),
     github_reserve_fraction: z.number().min(0.2).max(1),
-    main_publication_bytes: z.number().int().max(256000).positive(),
+    main_publication_bytes: z.number().int().max(600000).positive(),
     detail_bytes: z.number().int().max(102400).positive(),
   })
   .strict();

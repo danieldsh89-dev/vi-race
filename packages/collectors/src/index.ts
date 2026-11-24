@@ -29,7 +29,22 @@ const RepoSchema = z.object({
   fork: z.boolean().optional(),
   owner: z.object({ login: z.string() }),
   parent: z.object({ id: z.number() }).optional(),
+  stargazers_count: z.number().int().nonnegative().optional(),
+  size: z.number().int().nonnegative().optional(),
+  forks_count: z.number().int().nonnegative().optional(),
+  language: z.string().nullable().optional(),
+  pushed_at: z.string().nullable().optional(),
+  created_at: z.string().nullable().optional(),
 });
+const ReadmeSchema = z.object({
+  sha: z.string(),
+  encoding: z.string(),
+  content: z.string(),
+});
+/** Páginas máximas de commits por recogida; el resto solo se pierde del detalle. */
+export const COMMIT_PAGES = 5;
+/** Ventana inicial de un repositorio nuevo. */
+export const BASELINE_DAYS = 7;
 const CommitSchema = z.object({
   sha: z.string(),
   html_url: z.url(),
@@ -209,6 +224,7 @@ export class GitHubClient {
     events: Observation[];
     state: SourceState;
     repository: Repository;
+    readme: { sha: string; text: string } | null;
   }> {
     const meta = await this.request(`/repos/${source.repository}`, {
       etag: state.etag,
@@ -224,7 +240,7 @@ export class GitHubClient {
     const base = `/repos/${repo.full_name}`;
     const since =
       state.cursor.since ??
-      new Date(Date.parse(now) - 30 * 86400000).toISOString();
+      new Date(Date.parse(now) - BASELINE_DAYS * 86400000).toISOString();
     const events: Observation[] = [];
     let head = state.cursor.head_sha;
     for (const kind of ["commits", "releases"] as const) {
@@ -232,7 +248,9 @@ export class GitHubClient {
         `${base}/${kind}?per_page=100${kind === "commits" ? `&since=${encodeURIComponent(since)}` : ""}`;
       let pages = 0;
       while (path) {
-        if (++pages > 10) throw new CollectionError("pagination_budget");
+        // Repositorios con miles de commits diarios: se conserva lo más reciente
+        // y se avanza el cursor; el recuento diario queda por debajo del real.
+        if (++pages > (kind === "commits" ? COMMIT_PAGES : 3)) break;
         const page = await this.request(path);
         const list = z
           .array(kind === "commits" ? CommitSchema : ReleaseSchema)
@@ -284,8 +302,33 @@ export class GitHubClient {
         path = kind === "releases" && older ? null : page.next;
       }
     }
+    let readme: { sha: string; text: string } | null = null;
+    let readmeEtag = state.readme_etag ?? null;
+    try {
+      const r = await this.request(`${base}/readme`, { etag: readmeEtag });
+      if (!r.not_modified) {
+        const parsed = ReadmeSchema.parse(r.data);
+        if (parsed.encoding === "base64")
+          readme = {
+            sha: parsed.sha,
+            text: Buffer.from(parsed.content, "base64")
+              .toString("utf8")
+              .slice(0, 400000),
+          };
+        readmeEtag = r.etag;
+      }
+    } catch (e) {
+      // Un README ausente o ilegible no invalida la recogida.
+      if (
+        e instanceof CollectionError &&
+        ["rate_limited", "budget_exhausted"].includes(e.code)
+      )
+        throw e;
+    }
+    const lastCommit = events.find((e) => e.event_type === "commit");
     return {
       events,
+      readme,
       repository: {
         id: `gh_${repo.id}`,
         project_id: source.project_id,
@@ -297,10 +340,24 @@ export class GitHubClient {
         head_sha: head,
         archived: repo.archived,
         parent_id: repo.parent ? String(repo.parent.id) : null,
+        stats: {
+          stars: repo.stargazers_count ?? 0,
+          forks: repo.forks_count ?? 0,
+          language: repo.language ?? null,
+          pushed_at: repo.pushed_at ?? null,
+          created_at: repo.created_at ?? null,
+          last_commit_at:
+            lastCommit?.source_published_at ?? state.cursor.since ?? null,
+          last_commit_message:
+            typeof lastCommit?.payload.message === "string"
+              ? lastCommit.payload.message.split("\n")[0].slice(0, 300)
+              : null,
+        },
       },
       state: {
         ...state,
         cursor: { since: now, head_sha: head },
+        readme_etag: readmeEtag,
         etag: response.etag,
         last_modified: response.last_modified,
         next_due_at: new Date(
@@ -351,6 +408,13 @@ export class GitHubClient {
             "Coincidencia de búsqueda; relevancia y capacidad pendientes de revisión humana.",
           linked_project_id: null,
           review_commit: null,
+          repo: {
+            stars: repo.stargazers_count ?? 0,
+            size_kb: repo.size ?? 0,
+            language: repo.language ?? null,
+            fork: repo.fork ?? false,
+            pushed_at: repo.pushed_at ?? null,
+          },
         });
       if (result.length >= this.budgets.max_candidates) break;
       path = res.next;

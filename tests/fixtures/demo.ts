@@ -120,6 +120,31 @@ export function demoPublication(rubric: Rubric): Publication {
       activity_30d: 24 - i * 3,
       last_confirmed_at: date,
       rank: null,
+      progress: {
+        ladder: "vi-avance-v1" as const,
+        level: [5, 3, 1][i],
+        steps: (["P1", "P2", "P3", "P4", "P5"] as const)
+          .slice(0, [5, 3, 1][i])
+          .map((step) => ({
+            step,
+            source_type: "readme" as const,
+            excerpt:
+              "Avance ficticio de demostración; no describe ningún proyecto real.",
+            ref: null,
+            detected_at: date,
+          })),
+        updated_at: date,
+      },
+      stats: {
+        stars: [1200, 340, 45][i],
+        forks: [80, 20, 3][i],
+        language: "Rust",
+        pushed_at: date,
+        created_at: "2026-11-20T00:00:00Z",
+        last_commit_at: date,
+        last_commit_message: "Cambio ficticio de demostración",
+      },
+      activity_daily: Array.from({ length: 14 }, (_, d) => (d * (3 - i)) % 9),
     };
   });
   return {

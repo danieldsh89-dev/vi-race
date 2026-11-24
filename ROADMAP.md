@@ -13,6 +13,10 @@ Actualizado: 24-11-2026. Repositorio público: https://github.com/danieldsh89-de
 | F07 IA | Contrato estricto de propuestas y plantillas; IA apagada y sin proveedor facturable. | Adaptador Workers AI gratuito, cuota real y revisión específica antes de activar. No bloquea el MVP. |
 | F08 TechRadar | Fuera del producto y de este repositorio. | Solo se estudiará tras demostrar utilidad real de VI Race. |
 
+## Cambio de dirección (24-11-2026)
+
+Decisión del propietario: panel autónomo de avances, sin revisión manual. Portada nueva «La carrera» con la escalera vi-avance-v1 (P1–P8), actividad de 14 días, línea temporal de avances y embudo por paso; 22 proyectos curados y seguimiento automático desde Radar. Detalle en `docs/progress-ladder.md`. La auditoría vi-pc-v1 queda en `/audit`.
+
 ## Evidencia de este bloque
 
 - `npm run check`: validación de 20 hitos y 100 puntos, tipos, **74 pruebas** y compilación web correctos.
@@ -28,4 +32,4 @@ Los valores exactos del artefacto pueden variar al recompilar. Las capturas y tr
 
 ## Punto de continuación
 
-Seguir `docs/deployment-progress.md`. Verificado: ciclo manual de datos (`45406517300`), despliegue automático (`45408906094`) y recuperación remota con rollback (`45408605441`). Campos del respaldo revisados como publicables y mantenimiento verificado (`45410989396`). Falta: registrar dos ejecuciones `schedule`. Después, F05 puede cerrarse; F03 sigue requiriendo revisiones humanas reales. No activar facturación ni pedir claves de modelos. Suite actual: 84 pruebas.
+Seguir `docs/deployment-progress.md`. Verificado: ciclo manual de datos (`45406517300`), despliegue automático (`45408906094`) y recuperación remota con rollback (`45408605441`). Campos del respaldo revisados como publicables y mantenimiento verificado (`45410989396`). Falta: registrar dos ejecuciones `schedule`. Después, F05 puede cerrarse; F03 sigue requiriendo revisiones humanas reales. No activar facturación ni pedir claves de modelos. Suite actual: 98 pruebas unitarias y 6 E2E.

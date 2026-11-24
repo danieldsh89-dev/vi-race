@@ -39,7 +39,15 @@ test("demo, filtros conservados, ficha, pruebas y método", async ({ page }) => 
   await expect(
     page.getByText("Demostración con datos ficticios.", { exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /Atlas Runtime/ })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /La carrera por llevar/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("img", { name: /Nivel 5 de 8/ }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Atlas Runtime/ }).first(),
+  ).toBeVisible();
   await page
     .getByRole("link", { name: "Proyectos", exact: true })
     .first()
@@ -73,7 +81,7 @@ test("demo, filtros conservados, ficha, pruebas y método", async ({ page }) => 
 });
 test("respaldo sin API y aviso sin conexión", async ({ page, context }) => {
   await page.goto("/");
-  await expect(page.getByText("La carrera empieza con pruebas")).toBeVisible();
+  await expect(page.getByText("Todavía no hay proyectos en seguimiento.")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Comprobar datos publicados" }),
   ).toBeDisabled();

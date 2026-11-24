@@ -87,6 +87,16 @@ export const CandidateSchema = z
       .regex(/^[a-f0-9]{40}$/)
       .nullable(),
     signals: z.array(z.enum(candidateSignals)).max(3).optional(),
+    repo: z
+      .object({
+        stars: z.number().int().nonnegative(),
+        size_kb: z.number().int().nonnegative(),
+        language: z.string().max(100).nullable(),
+        fork: z.boolean(),
+        pushed_at: z.string().max(40).nullable(),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 export const PublicationSchema = z
@@ -112,9 +122,52 @@ export const PublicationSchema = z
               activity_30d: z.number().int().nonnegative(),
               last_confirmed_at: utc.nullable(),
               rank: z.number().int().positive().nullable(),
+              progress: z
+                .object({
+                  ladder: z.literal("vi-avance-v1"),
+                  level: z.number().int().min(0).max(8),
+                  steps: z
+                    .array(
+                      z
+                        .object({
+                          step: z.enum([
+                            "P1",
+                            "P2",
+                            "P3",
+                            "P4",
+                            "P5",
+                            "P6",
+                            "P7",
+                            "P8",
+                          ]),
+                          source_type: z.enum(["readme", "release", "commit"]),
+                          excerpt: z.string().max(300),
+                          ref: z.string().max(500).nullable(),
+                          detected_at: utc,
+                          baseline: z.boolean().optional(),
+                        })
+                        .strict(),
+                    )
+                    .max(8),
+                  updated_at: utc.nullable(),
+                })
+                .strict(),
+              stats: z
+                .object({
+                  stars: z.number().int().nonnegative(),
+                  forks: z.number().int().nonnegative(),
+                  language: z.string().max(100).nullable(),
+                  pushed_at: z.string().max(40).nullable(),
+                  created_at: z.string().max(40).nullable(),
+                  last_commit_at: z.string().max(40).nullable(),
+                  last_commit_message: z.string().max(300).nullable(),
+                })
+                .strict()
+                .nullable(),
+              activity_daily: z.array(z.number().int().nonnegative()).max(31),
             }).strict(),
           )
-          .max(20),
+          .max(60),
         candidates: z.array(CandidateSchema).max(1000),
         sources: z
           .array(

@@ -14,7 +14,7 @@ import {
 } from "@vi/storage";
 import { currentPublication } from "./pipeline";
 import { openStore } from "./store";
-import {applyRetention} from './retention';
+import { applyRetention } from "./retention";
 const store = openStore();
 try {
   const now = new Date(),
@@ -73,7 +73,7 @@ try {
       { sql: "DELETE FROM publications WHERE id=?", params: [p.id] },
     );
   await store.batch(statements);
-  await applyRetention(store,now.toISOString());
+  await applyRetention(store, now.toISOString());
   console.log(
     `Respaldo normalizado verificado por restauración local: ${bytes} bytes. ${obsolete.length} publicaciones antiguas retiradas. No se han eliminado identidades, evaluaciones ni evidencias.`,
   );

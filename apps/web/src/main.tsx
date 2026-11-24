@@ -44,6 +44,7 @@ import { freshness, globalHealth } from "@vi/domain";
 import { getPublication } from "./services";
 import { dateTime, labels } from "./text";
 import deploymentAudit from "../../../config/deployment.json";
+import { ProgressPanel, RaceDashboard } from "./race";
 import "./styles.css";
 const api = import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? "";
 function App() {
@@ -176,7 +177,7 @@ function App() {
           </Link>
           <nav aria-label="Principal" className={menu ? "nav open" : "nav"}>
             {[
-              ["/", "Resumen"],
+              ["/", "Carrera"],
               ["/projects", "Proyectos"],
               ["/radar", "Radar"],
               ["/methodology", "Método"],
@@ -276,6 +277,10 @@ function App() {
           <Routes>
             <Route
               path="/"
+              element={<RaceDashboard p={publication} link={link} />}
+            />
+            <Route
+              path="/audit"
               element={<Dashboard p={publication} link={link} />}
             />
             <Route
@@ -881,19 +886,15 @@ function ProjectDetail({ p, link }: Props) {
           </ProjectLink>
         </div>
         <div className="detail-score">
-          {project.rank === null ? (
-            <>
-              <Tag>Componente: fuera de la carrera</Tag>
-              <p>No se normaliza a 100.</p>
-            </>
-          ) : (
-            <>
-              <ScoreNumber project={project} />
-              <small>
-                {project.score.confirmed_count} de 20 hitos confirmados
-              </small>
-            </>
-          )}
+          <div className="score-number">
+            <strong>P{project.progress.level}</strong>
+            <span>/ 8 pasos</span>
+          </div>
+          <small>
+            {project.rank === null
+              ? "Componente: fuera de la carrera"
+              : `${project.score.confirmed_count} de 20 hitos con auditoría`}
+          </small>
         </div>
       </div>
       <div className="detail-facts">
@@ -904,6 +905,7 @@ function ProjectDetail({ p, link }: Props) {
         </span>
         <span>Comprobado: {dateTime(project.last_checked_at)}</span>
       </div>
+      <ProgressPanel project={project} />
       <div className="two-column">
         <section className="panel">
           <Eyebrow>CAPACIDAD DEMOSTRADA</Eyebrow>
