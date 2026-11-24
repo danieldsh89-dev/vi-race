@@ -40,6 +40,7 @@ import {
   level as progressLevel,
   mergeProgress,
   relevantLines,
+  RULES_VERSION,
   revalidate,
   type ProgressSignal,
   type ProgressState,
@@ -288,17 +289,26 @@ ${text(e.payload.summary)}`,
     });
   }
   let progress: CollectionExtras["progress"];
-  if (project && signals.length) {
+  if (project) {
     const previous = await readProgress(store, project.id);
-    // Primera lectura: lo que ya anunciaba el proyecto es su punto de partida.
-    const first = previous.updated_at === null;
+    // Primera lectura, o relectura por reglas nuevas: lo que ya anunciaba el
+    // proyecto es su punto de partida, no una novedad.
+    const first = !previous.first_read_at && previous.updated_at === null;
+    const relearn = (previous.rules ?? 1) < RULES_VERSION && !!result.readme;
     const merged = mergeProgress(
       previous,
-      first ? signals.map((s) => ({ ...s, baseline: true })) : signals,
+      first || relearn ? signals.map((s) => ({ ...s, baseline: true })) : signals,
       now,
     );
-    if (merged.changed)
-      progress = { project_id: project.id, state: merged.state };
+    if (merged.changed || !previous.first_read_at || relearn)
+      progress = {
+        project_id: project.id,
+        state: {
+          ...merged.state,
+          first_read_at: previous.first_read_at ?? now,
+          rules: result.readme ? RULES_VERSION : previous.rules,
+        },
+      };
   }
   return {
     result: { ...result, events },
@@ -954,7 +964,15 @@ export async function runCycle(
       ).find((s) => s.source_id === source.id)!;
       if (state.next_due_at > now) continue;
       try {
-        const collected = await client.collect(source, state, now);
+        // Reglas de detección nuevas: se vuelve a pedir el README sin ETag.
+        const rules = source.project_id
+          ? ((await readProgress(store, source.project_id)).rules ?? 1)
+          : RULES_VERSION;
+        const collected = await client.collect(
+          source,
+          rules < RULES_VERSION ? { ...state, readme_etag: null } : state,
+          now,
+        );
         const prepared = await prepareCollection(
           store,
           c.projects.find((p) => p.id === source.project_id),
