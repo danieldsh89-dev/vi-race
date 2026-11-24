@@ -89,3 +89,15 @@ it("casos reales: tablas de estado y rutas de archivo", () => {
     steps("Work on booting can start as soon as one is available.", "readme"),
   ).toEqual([]);
 });
+it("el selector de jugador en pantalla cuenta como primeros gráficos", () => {
+  const steps = detect(
+    {
+      source_type: "readme",
+      text: "**GTA VI (ProjectScarlett)** shows the player selection prompt at 3840×2160 on stock Proton Experimental.",
+      ref: null,
+      at,
+    },
+    { multiTitle: true },
+  ).map((s) => s.step);
+  expect(steps).toEqual(["P3"]);
+});

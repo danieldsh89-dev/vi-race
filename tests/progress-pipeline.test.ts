@@ -106,3 +106,64 @@ it("una recogida cuenta commits por día y guarda solo lo que anuncia avances", 
   expect(view.activity_daily.at(-1)).toBe(31);
   store.close();
 });
+it("lo anunciado al empezar es punto de partida; lo posterior es novedad", async () => {
+  const store = new LocalStore();
+  store.migrate();
+  const c = {
+    ...config,
+    discovery: { ...config.discovery, enabled: false },
+    features: { ...config.features, github_enabled: false },
+  };
+  await runCycle(store, c, new GitHubClient(undefined, c.budgets), now);
+  const state =
+    (await readEntities<SourceState>(store, "source_state")).find(
+      (s) => s.source_id === source.id,
+    ) ?? initialState(source.id);
+  const next = { ...state, last_checked_at: now };
+  const repository = {
+    id: `gh_${source.provider_repo_id}`,
+    project_id: project.id,
+    provider_repo_id: source.provider_repo_id!,
+    owner: "x",
+    name: "y",
+    canonical_url: "https://github.com/x/y",
+    default_branch: "main",
+    head_sha: null,
+    archived: false,
+    parent_id: null,
+  };
+  const first = await prepareCollection(
+    store,
+    project,
+    {
+      events: [],
+      state: next,
+      repository,
+      readme: { sha: "r1", text: "Early development. Nothing works yet." },
+    },
+    now,
+  );
+  await persistCollection(store, state, first.result, first.extras);
+  const read = await readProgress(store, project.id);
+  expect(read.first_read_at).toBe(now);
+  expect(Object.keys(read.steps)).toEqual([]);
+  const later = "2026-11-25T12:00:00.000Z";
+  const second = await prepareCollection(
+    store,
+    project,
+    {
+      events: [
+        event(200, "commit", { message: "Now reaches the title screen", url: null }, later),
+      ],
+      state: { ...next, last_checked_at: later },
+      repository,
+      readme: null,
+    },
+    later,
+  );
+  await persistCollection(store, next, second.result, second.extras);
+  const after = await readProgress(store, project.id);
+  expect(after.steps.P5).toBeDefined();
+  expect(after.steps.P5?.baseline).toBeUndefined();
+  store.close();
+});

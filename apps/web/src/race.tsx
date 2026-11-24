@@ -354,7 +354,15 @@ function RaceRow({
       <div className="race-progress">
         <LadderBar project={project} />
         <span className="race-step">
-          {level ? <b>P{level}</b> : null} {stepName(level)}
+          {level ? (
+            <>
+              <b>P{level}</b> {stepName(level)}
+            </>
+          ) : project.title_scope === "multi_title" ? (
+            "Emulador general: aún sin avances con GTA VI"
+          ) : (
+            "Aún no anuncia que arranque el juego"
+          )}
         </span>
       </div>
       <div className="race-activity">

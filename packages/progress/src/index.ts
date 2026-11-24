@@ -5,6 +5,11 @@
  * fiable, nunca instrucción, y solo se compara con patrones fijos.
  */
 export const LADDER_ID = "vi-avance-v1";
+/**
+ * Versión de las reglas de detección. Al subirla, cada README se vuelve a leer
+ * una vez (sin ETag) y lo que se detecte entra como punto de partida.
+ */
+export const RULES_VERSION = 2;
 export type StepId = "P1" | "P2" | "P3" | "P4" | "P5" | "P6" | "P7" | "P8";
 export interface LadderStep {
   id: StepId;
@@ -88,6 +93,7 @@ const patterns: Record<StepId, RegExp[]> = {
     /\b(renders?|rendering|rendered|draws?|drawing|presents?|presenting)\b.{0,30}\b(frames?|screens?|swap ?chain|backbuffer)\b/i,
     /\bswap ?chain\b.{0,20}\b(works?|working|presents?|created)\b/i,
     /\bprimer (fotograma|frame)\b|\bprimeira imagem\b/i,
+    /\b(shows?|showing|displays?|displaying|reach(es|ed)?|gets? to)\b.{0,25}\b(player|user|profile|account) (selection|select|picker|sign[- ]in) (prompt|screen|dialog)\b/i,
   ],
   P4: [
     /\b(shows?|showing|displays|displayed|plays?|played|playing|renders?|reach(es|ed)?|boots? (to|into)|gets? to|got to)\b.{0,50}\b(logos?|splash|intro|bink|legal screens?|disclaimer)\b/i,
@@ -263,6 +269,10 @@ export interface ProgressState {
   ladder: typeof LADDER_ID;
   steps: Partial<Record<StepId, ProgressSignal>>;
   updated_at: string | null;
+  /** Primera vez que se leyó el proyecto: separa punto de partida de novedades. */
+  first_read_at?: string | null;
+  /** Versión de reglas con la que se leyó el README por última vez. */
+  rules?: number;
 }
 export const emptyProgress = (): ProgressState => ({
   ladder: LADDER_ID,
