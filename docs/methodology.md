@@ -1,5 +1,7 @@
 # Metodología vi-pc-v1
 
+> La vista principal usa la escalera automática vi-avance-v1 (`docs/progress-ladder.md`). Esta rúbrica estricta sigue vigente como auditoría en `/audit`.
+
 Fuente normativa: sección 11 del documento maestro; la tabla se transcribió literalmente a `config/rubrics/vi-pc-v1.json`. Son 20 hitos, con pesos positivos que suman 100 y dependencias sin ciclos.
 
 Cada hito contribuye su peso completo si está confirmed para la versión evaluada, vigente al corte, aprobado, con soporte y todas sus dependencias satisfechas. No hay puntos parciales. Declaraciones, actividad e IA no añaden puntos. Componentes, herramientas, investigación y candidatos quedan fuera de la clasificación de rutas completas.

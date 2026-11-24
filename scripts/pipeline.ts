@@ -23,6 +23,7 @@ import { declaredFork } from "@vi/dna";
 import {
   mergeCandidates,
   applyCandidateReview,
+  applyClassification,
   duplicationSignals,
 } from "@vi/radar";
 import {
@@ -32,7 +33,17 @@ import {
   type SqlStore,
   type Statement,
 } from "@vi/storage";
-import { CollectionError, GitHubClient } from "@vi/collectors";
+import { CollectionError, GitHubClient, hash } from "@vi/collectors";
+import {
+  detect,
+  emptyProgress,
+  level as progressLevel,
+  mergeProgress,
+  relevantLines,
+  revalidate,
+  type ProgressSignal,
+  type ProgressState,
+} from "@vi/progress";
 import type { Config } from "./config";
 import { assertProductionInputs } from "./config";
 import { PublicationSchema } from "@vi/contracts/publication";
@@ -79,10 +90,17 @@ export async function persistFailure(
     { sql: "DELETE FROM write_guards WHERE id=?", params: [guard] },
   ]);
 }
+export interface CollectionExtras {
+  /** Commits por día UTC (fecha del commit). Sustituye al recuento por evento. */
+  commitDaily?: Record<string, number>;
+  /** Estado de avances actualizado del proyecto, si cambió. */
+  progress?: { project_id: string; state: ProgressState };
+}
 export async function persistCollection(
   store: SqlStore,
   previous: SourceState,
   result: { events: Observation[]; state: SourceState; repository: Repository },
+  extras: CollectionExtras = {},
 ) {
   const guard = `cursor_${randomUUID()}`,
     r = result.repository;
@@ -106,20 +124,44 @@ export async function persistCollection(
       "update",
     ),
   ];
-  for (const e of result.events) {
+  for (const [day, count] of Object.entries(extras.commitDaily ?? {}))
     statements.push({
-      sql: "INSERT INTO event_daily(source_id,day_utc,event_type,project_id,event_count,compacted_at) SELECT ?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM events WHERE source_id=? AND external_id=?) ON CONFLICT(source_id,day_utc,event_type) DO UPDATE SET event_count=event_count+1,compacted_at=excluded.compacted_at",
+      sql: "INSERT INTO event_daily(source_id,day_utc,event_type,project_id,event_count,compacted_at) VALUES (?,?,?,?,?,?) ON CONFLICT(source_id,day_utc,event_type) DO UPDATE SET event_count=event_count+excluded.event_count,compacted_at=excluded.compacted_at",
       params: [
-        e.source_id,
-        e.observed_at.slice(0, 10),
-        e.event_type,
-        e.project_id,
-        1,
-        e.observed_at,
-        e.source_id,
-        e.external_id,
+        previous.source_id,
+        day,
+        "commit",
+        r.project_id,
+        count,
+        result.state.last_checked_at ?? day,
       ],
     });
+  if (extras.progress)
+    statements.push(
+      insert(
+        "pipeline_state",
+        {
+          key: `progress:${extras.progress.project_id}`,
+          value_json: JSON.stringify(extras.progress.state),
+        },
+        "update",
+      ),
+    );
+  for (const e of result.events) {
+    if (!(extras.commitDaily && e.event_type === "commit"))
+      statements.push({
+        sql: "INSERT INTO event_daily(source_id,day_utc,event_type,project_id,event_count,compacted_at) SELECT ?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM events WHERE source_id=? AND external_id=?) ON CONFLICT(source_id,day_utc,event_type) DO UPDATE SET event_count=event_count+1,compacted_at=excluded.compacted_at",
+        params: [
+          e.source_id,
+          e.observed_at.slice(0, 10),
+          e.event_type,
+          e.project_id,
+          1,
+          e.observed_at,
+          e.source_id,
+          e.external_id,
+        ],
+      });
     statements.push(
       insert("events", {
         id: e.id,
@@ -139,6 +181,129 @@ export async function persistCollection(
     params: [guard],
   });
   await store.batch(statements);
+}
+/** Commits con anuncio de avance que se guardan como evento por recogida. */
+const MAX_NOTABLE_COMMITS = 20;
+export async function readProgress(
+  store: SqlStore,
+  projectId: string,
+): Promise<ProgressState> {
+  const row = (
+    await store.query<{ value_json: string }>(
+      "SELECT value_json FROM pipeline_state WHERE key=?",
+      [`progress:${projectId}`],
+    )
+  )[0];
+  return row ? (JSON.parse(row.value_json) as ProgressState) : emptyProgress();
+}
+/**
+ * Reduce una recogida a lo que merece guardarse y detecta avances anunciados.
+ * Los commits se cuentan por día; solo se guardan los que anuncian un avance,
+ * además de versiones publicadas y cambios de README (extractos, no el texto).
+ */
+export async function prepareCollection(
+  store: SqlStore,
+  project: Config["projects"][number] | undefined,
+  result: {
+    events: Observation[];
+    state: SourceState;
+    repository: Repository;
+    readme?: { sha: string; text: string } | null;
+  },
+  now: string,
+) {
+  const options = {
+    multiTitle: project?.title_scope === "multi_title",
+    aliases: project?.gta_aliases,
+  };
+  const signals: ProgressSignal[] = [];
+  const events: Observation[] = [];
+  const commitDaily: Record<string, number> = {};
+  let notable = 0;
+  const text = (v: unknown) => (typeof v === "string" ? v : "");
+  for (const e of result.events) {
+    const at = e.source_published_at ?? now;
+    if (e.event_type === "commit") {
+      const day = at.slice(0, 10);
+      commitDaily[day] = (commitDaily[day] ?? 0) + 1;
+      const found = detect(
+        {
+          source_type: "commit",
+          text: text(e.payload.message),
+          ref: text(e.payload.url) || null,
+          at,
+        },
+        options,
+      );
+      if (found.length && notable < MAX_NOTABLE_COMMITS) {
+        notable++;
+        events.push(e);
+        signals.push(...found);
+      }
+    } else {
+      events.push(e);
+      if (e.event_type === "release")
+        signals.push(
+          ...detect(
+            {
+              source_type: "release",
+              text: `${text(e.payload.name)}
+${text(e.payload.tag)}
+${text(e.payload.summary)}`,
+              ref: text(e.payload.url) || null,
+              at,
+            },
+            options,
+          ),
+        );
+    }
+  }
+  if (result.readme) {
+    const found = detect(
+      {
+        source_type: "readme",
+        text: result.readme.text,
+        ref: `${result.repository.canonical_url}#readme`,
+        at: now,
+      },
+      options,
+    );
+    signals.push(...found);
+    const payload = {
+      sha: result.readme.sha,
+      excerpts: found.map((f) => ({ step: f.step, excerpt: f.excerpt })),
+      lines: relevantLines(result.readme.text, 10).map((l) => l.slice(0, 200)),
+    };
+    const external = `readme:${result.repository.provider_repo_id}:${result.readme.sha}`;
+    events.push({
+      id: `evt_${hash([result.state.source_id, external]).slice(0, 32)}`,
+      source_id: result.state.source_id,
+      project_id: result.repository.project_id,
+      external_id: external,
+      event_type: "readme",
+      source_published_at: null,
+      observed_at: now,
+      content_hash: hash(payload),
+      payload,
+    });
+  }
+  let progress: CollectionExtras["progress"];
+  if (project && signals.length) {
+    const previous = await readProgress(store, project.id);
+    // Primera lectura: lo que ya anunciaba el proyecto es su punto de partida.
+    const first = previous.updated_at === null;
+    const merged = mergeProgress(
+      previous,
+      first ? signals.map((s) => ({ ...s, baseline: true })) : signals,
+      now,
+    );
+    if (merged.changed)
+      progress = { project_id: project.id, state: merged.state };
+  }
+  return {
+    result: { ...result, events },
+    extras: { commitDaily, progress } satisfies CollectionExtras,
+  };
 }
 async function initialize(store: SqlStore, c: Config, rulesCommit: string) {
   const rubricRow = await store.query<{ definition_hash: string }>(
@@ -498,6 +663,26 @@ export async function buildPublication(
   const relations = repos
     .map((r) => declaredFork(r, repos))
     .filter((r): r is Relation => r !== null);
+  const progressRows = await store.query<{ key: string; value_json: string }>(
+    "SELECT key,value_json FROM pipeline_state WHERE key LIKE 'progress:%'",
+  );
+  const progressOf = (id: string): ProgressState =>
+    progressRows.find((r) => r.key === `progress:${id}`)
+      ? JSON.parse(
+          progressRows.find((r) => r.key === `progress:${id}`)!.value_json,
+        )
+      : emptyProgress();
+  const days = Array.from({ length: 14 }, (_, i) =>
+    new Date(Date.parse(now) - (13 - i) * 86400000).toISOString().slice(0, 10),
+  );
+  const commitRows = await store.query<{
+    project_id: string | null;
+    day_utc: string;
+    n: number;
+  }>(
+    "SELECT project_id,day_utc,sum(event_count) AS n FROM event_daily WHERE event_type='commit' AND day_utc>=? GROUP BY project_id,day_utc",
+    [days[0]],
+  );
   const views: ProjectView[] = c.projects.map((p) => {
     const ps = sources.filter((s) => s.project_id === p.id),
       activity = daily.find((d) => d.project_id === p.id),
@@ -523,6 +708,23 @@ export async function buildPublication(
           .filter((d): d is string => !!d)
           .sort()
           .at(-1) ?? null,
+      progress: (() => {
+        const st = revalidate(progressOf(p.id));
+        return {
+          ladder: "vi-avance-v1" as const,
+          level: progressLevel(st),
+          steps: Object.values(st.steps)
+            .filter((x): x is ProgressSignal => !!x)
+            .sort((a, b) => a.step.localeCompare(b.step)),
+          updated_at: st.updated_at,
+        };
+      })(),
+      stats: repos.find((r) => r.project_id === p.id && r.stats)?.stats ?? null,
+      activity_daily: days.map(
+        (d) =>
+          commitRows.find((r) => r.project_id === p.id && r.day_utc === d)?.n ??
+          0,
+      ),
       activity_7d: activity?.activity_7d ?? 0,
       activity_30d: activity?.activity_30d ?? 0,
       last_confirmed_at:
@@ -610,7 +812,16 @@ export async function buildPublication(
     mode: "normal",
     data: {
       projects: rankProjects(views),
-      candidates: duplicationSignals(candidates),
+      // Radar público acotado: pendientes y seguidos completos, rechazos recientes.
+      candidates: (() => {
+        const all = duplicationSignals(candidates).sort((a, b) =>
+          b.last_seen_at.localeCompare(a.last_seen_at),
+        );
+        return [
+          ...all.filter((x) => x.status !== "rejected").slice(0, 150),
+          ...all.filter((x) => x.status === "rejected").slice(0, 60),
+        ];
+      })(),
       sources,
       rubric: c.rubric,
       events: events
@@ -630,14 +841,79 @@ export async function buildPublication(
         : [],
   };
 }
+/** Proyectos admitidos por el Radar automático, como si estuvieran configurados. */
+export function withAutoTracked(c: Config, candidates: Candidate[]): Config {
+  const known = new Set(c.sources.map((s) => s.provider_repo_id));
+  const room = Math.max(0, c.budgets.max_projects - c.projects.length);
+  const auto = candidates
+    .filter(
+      (x) =>
+        x.status === "accepted" &&
+        x.linked_project_id?.startsWith("project_auto_") &&
+        !known.has(x.provider_repo_id),
+    )
+    .sort((a, b) => (b.repo?.stars ?? 0) - (a.repo?.stars ?? 0))
+    .slice(0, room);
+  if (!auto.length) return c;
+  const projects = auto.map((x) => {
+    const gta = /\b(gta|grand theft auto|leonida|vice city)\b/i.test(
+      `${x.name} ${x.description}`,
+    );
+    return {
+      id: x.linked_project_id!,
+      slug: `auto-${x.provider_repo_id}`,
+      name: x.name.split("/")[1]?.slice(0, 160) || x.name.slice(0, 160),
+      description: (x.description || "Sin descripción pública.").slice(0, 2000),
+      project_type: "full_route" as const,
+      category: "Detectado automáticamente",
+      review_status: "accepted" as const,
+      maintenance_status: "active" as const,
+      ranking_eligible: false,
+      official_url: x.canonical_url,
+      title_scope: gta ? ("gta_vi" as const) : ("multi_title" as const),
+      created_at: x.first_seen_at,
+      updated_at: x.last_seen_at,
+    };
+  });
+  const sources = auto.map((x) => ({
+    id: `source_gh_${x.provider_repo_id}`,
+    project_id: x.linked_project_id!,
+    adapter: "github" as const,
+    repository: x.name,
+    provider_repo_id: x.provider_repo_id,
+    enabled: true,
+    priority: "secondary" as const,
+    interval_minutes: 60,
+    canonical_url: x.canonical_url,
+    terms_url:
+      "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+    access_notes:
+      "Admitido por el Radar automático. API REST pública de GitHub; sin descargar ni ejecutar código.",
+  }));
+  return {
+    ...c,
+    projects: [...c.projects, ...projects],
+    sources: [...c.sources, ...sources],
+    target_versions: {
+      ...c.target_versions,
+      ...Object.fromEntries(
+        projects.map((p) => [p.id, "Xbox Series (build pública)"]),
+      ),
+    },
+  };
+}
 export async function runCycle(
   store: SqlStore,
-  c: Config,
+  config: Config,
   client: GitHubClient,
   now: string,
   rulesCommit = "0000000000000000000000000000000000000000",
 ) {
-  assertProductionInputs(c);
+  assertProductionInputs(config);
+  const c = withAutoTracked(
+    config,
+    await readEntities<Candidate>(store, "discovery_candidates"),
+  );
   const start = Date.now(),
     run: Run = {
       id: `run_${randomUUID()}`,
@@ -678,8 +954,14 @@ export async function runCycle(
       ).find((s) => s.source_id === source.id)!;
       if (state.next_due_at > now) continue;
       try {
-        const result = await client.collect(source, state, now);
-        await persistCollection(store, state, result);
+        const collected = await client.collect(source, state, now);
+        const prepared = await prepareCollection(
+          store,
+          c.projects.find((p) => p.id === source.project_id),
+          collected,
+          now,
+        );
+        await persistCollection(store, state, prepared.result, prepared.extras);
       } catch (e) {
         if (!(e instanceof CollectionError)) throw e;
         const code = e.code;
@@ -732,9 +1014,17 @@ export async function runCycle(
           store,
           "discovery_candidates",
         );
-        const statements = mergeCandidates(
-          previous,
-          incoming.slice(0, c.budgets.max_candidates),
+        const tracked = new Map(
+          c.sources
+            .filter((s) => s.provider_repo_id && s.project_id)
+            .map((s) => [s.provider_repo_id!, s.project_id!]),
+        );
+        const statements = applyClassification(
+          mergeCandidates(
+            previous,
+            incoming.slice(0, c.budgets.max_candidates),
+          ),
+          tracked,
         ).map((candidate) =>
           insert(
             "discovery_candidates",

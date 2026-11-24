@@ -260,8 +260,12 @@ it("restaura copia normalizada con hashes y referencias iguales", async () => {
     copy.close();
   }
 });
-it("dos ciclos sin IA mantienen catálogo vacío y publicación coherente", async () => {
-  const c = { ...config, discovery: { ...config.discovery, enabled: false } };
+it("dos ciclos sin red publican los proyectos configurados sin avances inventados", async () => {
+  const c = {
+    ...config,
+    discovery: { ...config.discovery, enabled: false },
+    features: { ...config.features, github_enabled: false },
+  };
   await runCycle(store, c, new GitHubClient(undefined, c.budgets), date);
   await runCycle(
     store,
@@ -269,7 +273,10 @@ it("dos ciclos sin IA mantienen catálogo vacío y publicación coherente", asyn
     new GitHubClient(undefined, c.budgets),
     "2026-11-24T12:10:00.000Z",
   );
-  expect((await currentPublication(store))?.data.projects).toEqual([]);
+  const projects = (await currentPublication(store))!.data.projects;
+  expect(projects).toHaveLength(config.projects.length);
+  expect(projects.every((p) => p.progress.level === 0)).toBe(true);
+  expect(projects.every((p) => p.score.score === 0)).toBe(true);
   expect(await store.query("SELECT * FROM pipeline_runs")).toHaveLength(2);
   expect(await store.query("SELECT * FROM rubrics")).toHaveLength(1);
 });

@@ -18,7 +18,14 @@ try {
       publication_id: result.publication.publication_id,
     }),
   );
-  if (result.run.status !== "success") process.exitCode = 1;
+  // Agotar el presupuesto por ciclo es normal con muchos proyectos: el resto
+  // se recoge en el siguiente ciclo. Solo fallan los errores reales.
+  const real = (result.run.error_summary ?? "")
+    .split("; ")
+    .filter(
+      (e) => e && !/:(budget_exhausted|time_budget|not_found)$|^time_budget$/.test(e),
+    );
+  if (result.run.status === "failed" || real.length) process.exitCode = 1;
 } finally {
   store.close();
 }

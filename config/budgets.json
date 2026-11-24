@@ -1,1 +1,1 @@
-{"max_projects":20,"requests_per_cycle":100,"max_payload_bytes":1000000,"max_candidates":30,"max_job_seconds":480,"github_reserve_fraction":0.2,"main_publication_bytes":256000,"detail_bytes":102400}
+{"max_projects":40,"requests_per_cycle":100,"max_payload_bytes":1000000,"max_candidates":30,"max_job_seconds":480,"github_reserve_fraction":0.2,"main_publication_bytes":512000,"detail_bytes":102400}
