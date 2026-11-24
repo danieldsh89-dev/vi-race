@@ -23,7 +23,7 @@ Decisión del propietario (24-11-2026): VI Race es un panel autónomo que reúne
 - El estado es acumulativo: se conserva la detección más antigua de cada paso y en cada publicación se revalida con las reglas vigentes.
 - Lo que un proyecto ya anunciaba en su primera lectura se marca como **punto de partida** (`baseline`) y no aparece como novedad.
 
-Es **lo que anuncian sus autores**, detectado automáticamente. No es una verificación independiente. La rúbrica estricta vi-pc-v1 (20 hitos, evidencia E2/E3 y revisión) sigue disponible en `/audit` y en cada ficha.
+Es **lo que anuncian sus autores**, detectado automáticamente. No es una verificación independiente. La rúbrica vi-pc-v1 (20 hitos con revisión humana) se retiró de la web el 24-11-2026 por decisión del propietario: no hay revisores y no se puede automatizar con honestidad. El código del backend se conserva sin uso visible.
 
 ## Radar y seguimiento automático
 
