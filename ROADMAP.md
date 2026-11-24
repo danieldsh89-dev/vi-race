@@ -28,5 +28,5 @@ Los valores exactos del artefacto pueden variar al recompilar. Las capturas y tr
 
 ## Punto de continuación
 
-Seguir `docs/deployment-progress.md`. El siguiente paso es guardar las credenciales separadas de datos y despliegue en el entorno `production`, activar y comprobar los workflows. La cuenta y la web ya están conectadas. No activar facturación ni pedir claves de modelos. La suite actual tiene 79 pruebas; los valores de la sección de evidencia anterior corresponden a la entrega local inicial.
+Seguir `docs/deployment-progress.md`. La credencial de datos ya funciona: un ciclo manual real actualizó D1 y publicó 32 candidatos pendientes. Falta guardar la credencial de despliegue en el entorno `production`, comprobar recuperación y mantenimiento y observar dos ejecuciones programadas. La cuenta y la web ya están conectadas. No activar facturación ni pedir claves de modelos. La suite actual tiene 84 pruebas; los valores de la sección de evidencia anterior corresponden a la entrega local inicial.
 

@@ -5,6 +5,7 @@
   "no_overage_verified": true,
   "cloudflare_account_id": "5f798ad04159176ee89552061f589d9e",
   "d1_database_id": "98b0d87c-282c-45e8-8d9f-dc980102cf1e",
+  "restore_check_database_id": "53de1fa0-dbc7-44cb-832b-b156c455582e",
   "pages_project": "vi-race",
   "site_origin": "https://vi-race.pages.dev",
   "verified_at": "2026-11-24T13:18:21.321Z",

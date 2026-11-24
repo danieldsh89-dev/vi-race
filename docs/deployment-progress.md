@@ -32,4 +32,12 @@ La compresión de Cloudflare convierte ETag en una etiqueta débil. Se añadió 
 
 Claude revisó de forma estática la importación y la API sin encontrar bloqueantes con los datos utilizados. Se amplió además el rechazo estructural de datos sintéticos a todas las tablas y cuerpos JSON del respaldo, incluidas publicaciones anteriores. La importación inicial por fichero no se anuncia como una transacción global: si se interrumpe y deja un destino parcial, la guarda impide mezclar otro intento. Recuperar desde la copia local verificada hacia una base nueva vacía y volver a comprobar integridad y publicación antes de cambiar el binding. No borrar ni sobrescribir la base parcial automáticamente.
 
-Pendiente para automatización: credenciales separadas de datos y despliegue en el entorno `production` de GitHub, dos ejecuciones programadas observadas, mantenimiento y restauración remota. `VI_RACE_ENABLED` continúa en false; una URL pública todavía no acredita monitorización automática.
+## Automatización y recuperación
+
+El secreto de datos se guardó directamente en el entorno `production` de GitHub. Sus valores nunca se leen ni se muestran desde esta sesión. El primer monitor manual detectó un fallo del lector de JSONC ante una coma final válida de Wrangler; se corrigió con `jsonc-parser` y tres casos de regresión. La ejecución manual `45406517300` terminó correctamente y publicó en D1 a las 13:45:01 UTC: 32 candidatos pendientes, cero proyectos admitidos. `VI_RACE_ENABLED=true`; la programación está activa, pero todavía no se han observado dos ejecuciones de evento `schedule`.
+
+El despliegue automático `45406513634` exportó datos y compiló correctamente, pero se detuvo por faltar `CLOUDFLARE_DEPLOY_TOKEN`. La credencial de despliegue debe guardarse aparte en el mismo entorno. Se añadieron interruptores separados `VI_RACE_DEPLOY_ENABLED` y `VI_RACE_MAINTENANCE_ENABLED` para habilitar esas tareas al terminar su configuración.
+
+Se creó D1 `vi-race-restore-check` (`53de1fa0-dbc7-44cb-832b-b156c455582e`) exclusivamente para un ensayo de recuperación, sin modificar la base publicada. El workflow manual prepara sus migraciones y usa el mismo adaptador REST de producción. El SQL de bootstrap también se expone como lista de statements, conservando los puntos y comas dentro del texto. Las comprobaciones locales actuales pasan: 84 pruebas, tipos y compilación. El resultado remoto del ensayo sigue pendiente.
+
+Pendiente: guardar y comprobar la credencial de despliegue, verificar el rollback remoto y la restauración, ejecutar mantenimiento con respaldo público revisado y observar dos ejecuciones programadas. Una URL pública y un ciclo manual no acreditan por sí solos toda la automatización.

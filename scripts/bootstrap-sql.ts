@@ -7,7 +7,7 @@ function literal(value: unknown): string {
   if (typeof value === "number" && Number.isFinite(value)) return String(value);
   throw new Error("Tipo no permitido en exportación SQL");
 }
-export function bootstrapSql(backup: Backup): string {
+export function bootstrapQueries(backup: Backup): string[] {
   if (
     backup.schema_version !== "1" ||
     checksum(backup.tables) !== backup.checksum ||
@@ -72,5 +72,8 @@ export function bootstrapSql(backup: Backup): string {
       `INSERT INTO publication_pointer(name,publication_id,updated_at) VALUES (${literal(row.name)},${literal(row.publication_id)},${literal(row.updated_at)});`,
     );
   sql.push("DELETE FROM write_guards WHERE id='bootstrap';");
-  return sql.join("\n");
+  return sql;
+}
+export function bootstrapSql(backup: Backup): string {
+  return bootstrapQueries(backup).join("\n");
 }

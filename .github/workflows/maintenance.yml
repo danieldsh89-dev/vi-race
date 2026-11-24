@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   maintenance:
-    if: github.event.repository.private == false && vars.VI_RACE_ENABLED == 'true'
+    if: github.event.repository.private == false && vars.VI_RACE_ENABLED == 'true' && vars.VI_RACE_MAINTENANCE_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     environment: production
