@@ -44,7 +44,14 @@ import { freshness, globalHealth } from "@vi/domain";
 import { getPublication } from "./services";
 import { dateTime, labels } from "./text";
 import deploymentAudit from "../../../config/deployment.json";
-import { ProgressPanel, RaceDashboard } from "./race";
+import {
+  byRace,
+  LadderBar,
+  ProgressPanel,
+  RaceDashboard,
+  stepName,
+  sum,
+} from "./race";
 import "./styles.css";
 const api = import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? "";
 function App() {
@@ -728,7 +735,7 @@ function Catalog({ p, link }: Props) {
   const q = params.get("q") ?? "",
     type = params.get("type") ?? "",
     maint = params.get("maintenance") ?? "",
-    ev = params.get("evidence") ?? "";
+    adv = params.get("advanced") ?? "";
   const set = (key: string, value: string) => {
     const next = new URLSearchParams(params);
     value ? next.set(key, value) : next.delete(key);
@@ -740,14 +747,20 @@ function Catalog({ p, link }: Props) {
         `${p.name} ${p.description}`.toLowerCase().includes(q.toLowerCase())) &&
       (!type || p.project_type === type) &&
       (!maint || p.maintenance_status === maint) &&
-      (!ev || p.evidence.length > 0),
+      (!adv || p.progress.level > 0),
+  )
+  // Rutas completas primero; los componentes van detrás.
+  .sort(
+    (a, b) =>
+      Number(a.project_type === "component") -
+        Number(b.project_type === "component") || byRace(a, b),
   );
   return (
     <>
       <PageTitle
         label="CATÁLOGO"
         title="Cada proyecto, en contexto."
-        description="Explora iniciativas admitidas. Su actividad, su alcance y su capacidad se muestran por separado."
+        description="Todos los proyectos seguidos, ordenados por el paso más alto que anuncian. Se actualiza solo cada 10 minutos."
       />
       <div className="filters">
         <label className="search-label">
@@ -789,10 +802,10 @@ function Catalog({ p, link }: Props) {
         <label className="checkbox">
           <input
             type="checkbox"
-            checked={!!ev}
-            onChange={(e) => set("evidence", e.target.checked ? "1" : "")}
+            checked={!!adv}
+            onChange={(e) => set("advanced", e.target.checked ? "1" : "")}
           />
-          Con evidencias
+          Con avances
         </label>
       </div>
       <div className="result-count">
@@ -816,16 +829,24 @@ function Catalog({ p, link }: Props) {
               </div>
               <h2>{project.name}</h2>
               <p>{project.description}</p>
+              <div className="card-progress">
+                <div className="score-number">
+                  <strong>P{project.progress.level}</strong>
+                  <span>/ 8 · {stepName(project.progress.level)}</span>
+                </div>
+                <LadderBar project={project} compact />
+              </div>
               <div className="card-bottom">
-                {project.rank === null ? (
-                  <span>Fuera de clasificación</span>
-                ) : (
-                  <ScoreNumber project={project} />
-                )}
-                <span>{project.score.confirmed_count} hitos confirmados</span>
+                <span>
+                  ★{" "}
+                  {project.stats
+                    ? project.stats.stars.toLocaleString("es")
+                    : "—"}
+                </span>
+                <span>{sum(project.activity_daily)} commits en 14 días</span>
               </div>
               <span className="card-link">
-                Consultar pruebas
+                Ver avances
                 <ChevronRight size={16} />
               </span>
             </Link>
