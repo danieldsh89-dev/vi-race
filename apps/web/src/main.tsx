@@ -586,7 +586,7 @@ function Catalog({ p, link }: Props) {
           detail={
             p.data.projects.length
               ? "Prueba otros filtros o modifica tu búsqueda."
-              : "Los candidatos se revisan antes de entrar al catálogo."
+              : "El Radar añade proyectos automáticamente cuando cumplen los criterios."
           }
           action={
             <Link className="button secondary" to={link("/radar")}>
@@ -660,16 +660,24 @@ const signalLabels: Record<CandidateSignal, string> = {
   profile_repository: "Repositorio de perfil de organización, sin código",
 };
 const statusLabels: Record<Candidate["status"], string> = {
-  pending_review: "Pendiente de revisión",
-  accepted: "Aceptado",
-  rejected: "Rechazado",
+  pending_review: "En observación",
+  accepted: "En seguimiento",
+  rejected: "Descartado",
   duplicate: "Duplicado",
-  deferred: "Aplazado",
+  deferred: "En observación",
 };
 function CandidateCard({ c }: { c: Candidate }) {
   return (
     <article className="project-card">
-      <Tag tone={c.signals?.length ? "muted" : "amber"}>
+      <Tag
+        tone={
+          c.status === "accepted"
+            ? "green"
+            : c.status === "pending_review"
+              ? "amber"
+              : "muted"
+        }
+      >
         {statusLabels[c.status]}
       </Tag>
       <h2>{c.name}</h2>
@@ -691,55 +699,60 @@ function CandidateCard({ c }: { c: Candidate }) {
   );
 }
 function RadarPage({ p }: { p: Publication }) {
-  const pending = p.data.candidates.filter(
-      (c) => c.status === "pending_review",
+  const watching = p.data.candidates.filter(
+      (c) =>
+        (c.status === "pending_review" || c.status === "deferred") &&
+        !c.signals?.length,
     ),
-    clean = pending.filter((c) => !c.signals?.length),
-    flagged = pending.filter((c) => c.signals?.length),
-    reviewed = p.data.candidates.filter((c) => c.status !== "pending_review");
+    tracked = p.data.candidates.filter((c) => c.status === "accepted"),
+    discarded = p.data.candidates.filter(
+      (c) =>
+        c.status === "rejected" ||
+        c.status === "duplicate" ||
+        !!c.signals?.length,
+    );
   return (
     <>
       <PageTitle
         label="PROJECT RADAR"
-        title="Descubrir es solo el principio."
-        description="Candidatos localizados en fuentes públicas. Permanecen fuera de la clasificación hasta que una persona revise su identidad y su alcance."
+        title="Busca proyectos nuevos solo."
+        description="Cada hora se buscan repositorios nuevos en GitHub y cada uno se clasifica automáticamente, con su motivo. Nadie los revisa a mano."
       />
       <div className="notice subtle">
-        Última búsqueda satisfactoria:{" "}
-        {dateTime(p.data.discovery_last_success_at)}. La cobertura es limitada;
-        no se presupone exhaustividad. VI Race rastrea estos repositorios sin
-        enlazarlos: muchos dependen de material filtrado o son reclamos. No
-        descargues ni ejecutes nada de ellos.
+        Última búsqueda: {dateTime(p.data.discovery_last_success_at)}. Se{" "}
+        <strong>añaden al seguimiento</strong> los proyectos técnicos con código
+        y al menos 25 estrellas; se <strong>descartan</strong> copias, reclamos
+        de descarga, repositorios vacíos, rastreadores y contenido de fans; el
+        resto queda <strong>en observación</strong> y se reevalúa en cada
+        búsqueda. No descargues ni ejecutes nada de estos repositorios.
       </div>
       {p.data.candidates.length ? (
         <>
-          {clean.length ? (
+          <h2 className="sub-head">En observación ({watching.length})</h2>
+          {watching.length ? (
             <div className="project-cards">
-              {clean.map((c) => (
+              {watching.map((c) => (
                 <CandidateCard c={c} key={c.id} />
               ))}
             </div>
           ) : (
-            <Empty
-              title="Sin candidatos pendientes sin señales"
-              detail="Los resultados nuevos aparecerán aquí tras la próxima búsqueda programada."
-            />
+            <p className="muted">Ningún repositorio en observación ahora.</p>
           )}
-          {flagged.length ? (
+          {tracked.length ? (
             <details className="radar-group">
-              <summary>Posibles copias o reclamos ({flagged.length})</summary>
+              <summary>Añadidos al seguimiento ({tracked.length})</summary>
               <div className="project-cards">
-                {flagged.map((c) => (
+                {tracked.map((c) => (
                   <CandidateCard c={c} key={c.id} />
                 ))}
               </div>
             </details>
           ) : null}
-          {reviewed.length ? (
+          {discarded.length ? (
             <details className="radar-group">
-              <summary>Decisiones registradas ({reviewed.length})</summary>
+              <summary>Descartados ({discarded.length})</summary>
               <div className="project-cards">
-                {reviewed.map((c) => (
+                {discarded.map((c) => (
                   <CandidateCard c={c} key={c.id} />
                 ))}
               </div>
@@ -749,7 +762,7 @@ function RadarPage({ p }: { p: Publication }) {
       ) : (
         <Empty
           title="Radar todavía sin candidatos"
-          detail="Las búsquedas programadas incorporarán resultados a esta bandeja. Un fallo de búsqueda conservará los candidatos anteriores."
+          detail="Las búsquedas automáticas irán incorporando resultados aquí."
         />
       )}
     </>

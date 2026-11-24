@@ -26,7 +26,7 @@
       "review_status": "accepted",
       "maintenance_status": "active",
       "ranking_eligible": true,
-      "official_url": "https://github.com/ivall/xcl",
+      "official_url": "https://github.com/xcl-dev/xcl",
       "title_scope": "multi_title",
       "gta_aliases": [
         "a newer retail game"
@@ -305,6 +305,72 @@
       "updated_at": "2026-11-24T16:00:00.000Z"
     },
     {
+      "id": "project_anyxboxx",
+      "slug": "anyxboxx",
+      "name": "AnyXboxX",
+      "description": "Prototipo centrado solo en la build de Xbox Series de GTA VI: traduce las funciones de sistema que importa y recompila sus shaders RDNA2 a D3D12. Parte del trabajo de VIctory.",
+      "project_type": "full_route",
+      "category": "Capa de compatibilidad",
+      "review_status": "accepted",
+      "maintenance_status": "active",
+      "ranking_eligible": true,
+      "official_url": "https://github.com/LooperSalty/AnyXboxX",
+      "title_scope": "gta_vi",
+      "created_at": "2026-11-24T16:00:00.000Z",
+      "updated_at": "2026-11-24T16:00:00.000Z"
+    },
+    {
+      "id": "project_openscarlett_ce",
+      "slug": "openscarlett-ce",
+      "name": "OpenScarlett (Community Edition)",
+      "description": "Capa de compatibilidad comunitaria para juegos de Xbox Series, distinta de OpenScarlett. GTA VI aparece como «a newer retail game».",
+      "project_type": "full_route",
+      "category": "Capa de compatibilidad",
+      "review_status": "accepted",
+      "maintenance_status": "active",
+      "ranking_eligible": true,
+      "official_url": "https://github.com/OpenCommunityEdition/OpenScarlett",
+      "title_scope": "multi_title",
+      "gta_aliases": [
+        "a newer retail game"
+      ],
+      "created_at": "2026-11-24T16:00:00.000Z",
+      "updated_at": "2026-11-24T16:00:00.000Z"
+    },
+    {
+      "id": "project_holy_interoperability",
+      "slug": "holy-interoperability",
+      "name": "Holy-Interoperability",
+      "description": "Capa que ejecuta paquetes de Xbox como procesos nativos de Windows con bibliotecas de sistema reimplementadas desde cero. No nombra el juego: habla de «a retail title».",
+      "project_type": "full_route",
+      "category": "Capa de compatibilidad",
+      "review_status": "accepted",
+      "maintenance_status": "active",
+      "ranking_eligible": true,
+      "official_url": "https://github.com/mewiof/Holy-Interoperability",
+      "title_scope": "multi_title",
+      "gta_aliases": [
+        "a retail title"
+      ],
+      "created_at": "2026-11-24T16:00:00.000Z",
+      "updated_at": "2026-11-24T16:00:00.000Z"
+    },
+    {
+      "id": "project_g6shim",
+      "slug": "g6shim",
+      "name": "g6shim",
+      "description": "Bibliotecas de sistema de consola reimplementadas desde cero para que el ejecutable arranque de forma nativa en Windows.",
+      "project_type": "full_route",
+      "category": "DLL sustitutas",
+      "review_status": "accepted",
+      "maintenance_status": "active",
+      "ranking_eligible": true,
+      "official_url": "https://github.com/gookie-dev/g6shim",
+      "title_scope": "gta_vi",
+      "created_at": "2026-11-24T16:00:00.000Z",
+      "updated_at": "2026-11-24T16:00:00.000Z"
+    },
+    {
       "id": "project_victory_macos",
       "slug": "victory-macos",
       "name": "VIctory para macOS",
@@ -356,6 +422,10 @@
     "project_tuxbox": "Xbox Series (build pública)",
     "project_xvalkyrie": "Xbox Series (build pública)",
     "project_scarlett_layer": "Xbox Series (build pública)",
+    "project_anyxboxx": "Xbox Series (build pública)",
+    "project_openscarlett_ce": "Xbox Series (build pública)",
+    "project_holy_interoperability": "Xbox Series (build pública)",
+    "project_g6shim": "Xbox Series (build pública)",
     "project_victory_macos": "Xbox Series (build pública)",
     "project_xenora": "Xbox Series (build pública)"
   }

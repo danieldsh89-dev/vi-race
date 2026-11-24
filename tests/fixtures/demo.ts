@@ -168,7 +168,7 @@ export function demoPublication(rubric: Rubric): Publication {
           first_seen_at: date,
           last_seen_at: date,
           status: "pending_review",
-          reason: "Relevancia pendiente de revisión humana",
+          reason: "En observación: menos de 25 estrellas.",
           linked_project_id: null,
           review_commit: null,
         },
