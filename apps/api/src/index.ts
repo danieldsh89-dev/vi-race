@@ -83,7 +83,15 @@ export default {
           ? "public, max-age=86400, immutable"
           : "public, max-age=120, stale-if-error=86400",
       );
-      if (request.headers.get("If-None-Match") === etag)
+      if (
+        request.headers
+          .get("If-None-Match")
+          ?.split(",")
+          .some(
+            (value) =>
+              value.trim() === "*" || value.trim().replace(/^W\//, "") === etag,
+          )
+      )
         return new Response(null, { status: 304, headers });
       return new Response(row.body_json, { headers });
     } catch {

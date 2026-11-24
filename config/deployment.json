@@ -1,1 +1,12 @@
-{"schema_version":"1","account_free_verified":false,"public_repository_verified":true,"no_overage_verified":false,"cloudflare_account_id":null,"d1_database_id":null,"pages_project":null,"site_origin":null,"verified_at":null,"verified_by":null}
+{
+  "schema_version": "1",
+  "account_free_verified": true,
+  "public_repository_verified": true,
+  "no_overage_verified": true,
+  "cloudflare_account_id": "5f798ad04159176ee89552061f589d9e",
+  "d1_database_id": "98b0d87c-282c-45e8-8d9f-dc980102cf1e",
+  "pages_project": "vi-race",
+  "site_origin": "https://vi-race.pages.dev",
+  "verified_at": "2026-11-24T13:18:21.321Z",
+  "verified_by": "danieldsh89-dev"
+}

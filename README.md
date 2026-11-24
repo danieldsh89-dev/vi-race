@@ -38,6 +38,6 @@ En Windows las pruebas de interfaz usan Edge instalado. En Linux/CI: `npx playwr
 
 La API Worker usa D1 por binding y solo admite lecturas. Actions escribe por la API de infraestructura con credenciales acotadas, separadas del token de despliegue. No hay administración pública.
 
-**Todavía no se declara desplegado ni verificado en producción.** Sigue [el manual](docs/operations.md) para conectar GitHub y una cuenta gratuita de Cloudflare. No introduzcas secretos en archivos ni en variables `VITE_*`.
+**La primera web pública está disponible en [vi-race.pages.dev](https://vi-race.pages.dev/)**, conectada a un Worker de lectura y a D1. La monitorización programada y el mantenimiento siguen pendientes de sus credenciales y comprobaciones; consulta [el progreso de despliegue](docs/deployment-progress.md). No introduzcas secretos en archivos ni en variables `VITE_*`.
 
 Lee [ROADMAP.md](ROADMAP.md), [la arquitectura](docs/architecture.md), [la metodología](docs/methodology.md), [el documento maestro](VI_RACE_DOCUMENTO_MAESTRO.md) y [el registro de entrega](docs/delivery.md) para conocer evidencias y límites concretos.

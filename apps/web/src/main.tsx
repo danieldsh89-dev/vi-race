@@ -38,6 +38,7 @@ import type { ProjectView, Publication } from "@vi/contracts";
 import { freshness, globalHealth } from "@vi/domain";
 import { getPublication } from "./services";
 import { dateTime, labels } from "./text";
+import deploymentAudit from "../../../config/deployment.json";
 import "./styles.css";
 const api = import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? "";
 function App() {
@@ -1356,7 +1357,13 @@ function Status({
           <dt>Última recopilación válida</dt>
           <dd>{dateTime(p.last_collection_success_at)}</dd>
           <dt>Coste de la cuenta</dt>
-          <dd>Pendiente de verificación en infraestructura real</dd>
+          <dd>
+            {deploymentAudit.account_free_verified &&
+            deploymentAudit.no_overage_verified &&
+            deploymentAudit.verified_at
+              ? `Plan gratuito comprobado: ${dateTime(deploymentAudit.verified_at)}`
+              : "Pendiente de verificación en infraestructura real"}
+          </dd>
         </dl>
         <p>
           Fuentes actualizadas: menos de tres intervalos sin comprobar.

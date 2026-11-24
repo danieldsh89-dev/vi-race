@@ -1,14 +1,14 @@
 # VI Race — Estado de implementación
 
-Actualizado: 24-11-2026. El repositorio y la aplicación existen en `E:/GTA VI Race`. No hay despliegue público ni monitorización programada acreditada.
+Actualizado: 24-11-2026. Repositorio público: https://github.com/danieldsh89-dev/vi-race. Primera web pública: https://vi-race.pages.dev/, conectada a Worker y D1. La monitorización programada y el mantenimiento todavía no están acreditados. Estado detallado: `docs/deployment-progress.md`.
 
 | Fase | Implementado y comprobado | Pendiente |
 |---|---|---|
-| F01 Base | Workspaces npm, TypeScript estricto, contratos Zod, rúbrica normativa, cuatro migraciones, SQLite, puerto D1 REST, decisiones y documentación. `npm run check`: correcto. | Publicar repositorio independiente cuando haya sesión del propietario. |
+| F01 Base | Workspaces npm, TypeScript estricto, contratos Zod, rúbrica normativa, cuatro migraciones, SQLite, puerto D1 REST, decisiones y documentación. Repositorio público creado y código subido; CI remota correcta. | Mantener pruebas en cambios posteriores. |
 | F02 Seguimiento | GitHub incremental, presupuesto, paginación, límites HTTP, reintentos, cursores CAS, deduplicación, Radar y forks declarados. Dos ciclos locales reales de Radar correctos; 30 candidatos sin admitir. Dos recogidas reales de GitHub en memoria correctas. | Comprobar D1 remoto y fuentes reales admitidas. Las recogidas reales del ejemplo fueron sin cambios; los cambios y duplicados se prueban con fixtures. |
 | F03 Evidencia y puntos | E2/E3 o informe independiente de otro revisor autorizado, historial append-only, rectificaciones, dependencias, hashes canónicos y publicación atómica. Revisión de Claude cerrada y casos añadidos a pruebas. | Registrar mantenedores y revisiones reales con protección de rama; no hay logros reales confirmados. |
 | F04 Interfaz | Resumen, catálogo, filtros URL, fichas, evidencia, Radar, metodología, fuentes, estado, comparador, temas, demo separada y lectura estática. Seis recorridos Playwright correctos; axe sin infracciones de las reglas WCAG seleccionadas a 360, 768 y 1440 px. | Medición de rendimiento móvil con perfil de red/CPU; la suite de accesibilidad automatizada no acredita todos los criterios manuales. |
-| F05 Publicación | Worker de lectura compilado, configuración Pages/D1, workflows por SHA, bloqueo común, exportación diaria, respaldo normalizado, restauración, retención y freno de despliegue incompleto. | Autenticar GitHub/Cloudflare, verificar Free y cuotas, crear recursos, aplicar migraciones remotas, desplegar y observar dos ejecuciones programadas. No marcar completada. |
+| F05 Publicación | Plan Free mostrado por el propietario, sesiones verificadas, recursos exclusivos creados, migraciones e importación D1 correctas, Worker de lectura y Pages publicados. HTTP, CORS, respaldo y rechazo de escrituras comprobados. | Conectar credenciales de automatización, verificar D1 REST batch, mantenimiento y restauración remota y observar dos ejecuciones programadas. No marcar completada. |
 | F06 Profundidad | Comparador de hasta tres rutas y parentesco explícito básico. | Huellas técnicas, identidad avanzada, análisis de README, issues, PR y etiquetas. |
 | F07 IA | Contrato estricto de propuestas y plantillas; IA apagada y sin proveedor facturable. | Adaptador Workers AI gratuito, cuota real y revisión específica antes de activar. No bloquea el MVP. |
 | F08 TechRadar | Fuera del producto y de este repositorio. | Solo se estudiará tras demostrar utilidad real de VI Race. |
@@ -28,5 +28,5 @@ Los valores exactos del artefacto pueden variar al recompilar. Las capturas y tr
 
 ## Punto de continuación
 
-Seguir `docs/operations.md`, apartado de publicación gratuita. Primero autenticar las cuentas existentes y comprobar el plan; no activar facturación ni pedir claves de modelos. Todo el código y las pruebas locales están preparados para continuar desde F05. No hay commits ni push realizados en este bloque.
+Seguir `docs/deployment-progress.md`. El siguiente paso es guardar las credenciales separadas de datos y despliegue en el entorno `production`, activar y comprobar los workflows. La cuenta y la web ya están conectadas. No activar facturación ni pedir claves de modelos. La suite actual tiene 79 pruebas; los valores de la sección de evidencia anterior corresponden a la entrega local inicial.
 

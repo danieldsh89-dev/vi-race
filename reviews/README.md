@@ -1,6 +1,6 @@
 # Revisiones humanas
 
-Los JSON de esta carpeta se revisan por cambios en GitHub, con protección de rama y CODEOWNERS configurados por el propietario. Configura los mantenedores en `config/reviewers.json`. Ese archivo vacío bloquea confirmaciones no autorizadas.
+Los JSON de esta carpeta se revisan por cambios en GitHub, con protección de rama y CODEOWNERS configurados por el propietario. Los mantenedores se registran en `config/reviewers.json`; una lista vacía bloquea todas las confirmaciones. El mantenedor actual corresponde a la cuenta que el propietario autorizó para este proyecto.
 
 Cada archivo contiene `schema_version: "1"`, arrays `evidence`, `assessments`, `candidate_reviews`. Los contratos exactos y campos obligatorios están en `packages/contracts/src/index.ts`. La evidencia usa un ID nuevo para un material nuevo; las evaluaciones son append-only y las correcciones indican `supersedes_id`. No editar la evaluación anterior.
 

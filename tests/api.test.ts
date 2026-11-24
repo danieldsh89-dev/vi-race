@@ -16,7 +16,8 @@ function env(
   return {
     env: {
       DB: db,
-      ALLOWED_ORIGINS: "http://127.0.0.1:5173,http://localhost:5173",
+      ALLOWED_ORIGINS:
+        "https://vi-race.pages.dev,http://127.0.0.1:5173,http://localhost:5173",
     } satisfies Env,
     prepare,
   };
@@ -42,6 +43,19 @@ it("ETag admite 304", async () => {
   );
   expect(r.status).toBe(304);
 });
+it.each(['W/"abc"', '"other", W/"abc"', "*"])(
+  "ETag admite comparación GET débil o lista: %s",
+  async (value) => {
+    const e = env();
+    const r = await api.fetch(
+      new Request("https://api.example/api/v1/latest", {
+        headers: { "If-None-Match": value },
+      }),
+      e.env,
+    );
+    expect(r.status).toBe(304);
+  },
+);
 it("rechaza métodos no admitidos", async () => {
   const e = env();
   expect(

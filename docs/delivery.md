@@ -1,5 +1,7 @@
 # Registro de entrega local — 24 de noviembre de 2026
 
+Este registro conserva la entrega local inicial. Para la primera publicación real posterior, sus comprobaciones y pendientes, consultar [deployment-progress.md](deployment-progress.md).
+
 ## Resultado
 
 Se ha construido una aplicación funcional en la carpeta de destino, con la arquitectura indicada por el documento maestro. Se puede abrir localmente y navegar de principio a fin. Radar contiene 30 candidatos obtenidos de una búsqueda pública real; ninguno ha sido admitido ni puntuado. El catálogo real está vacío. Las fichas de ejemplo viven en una demostración inequívocamente etiquetada.
