@@ -57,3 +57,9 @@ Revisión de solo lectura de D1 producción (24-11-2026, 14:05 UTC): 32 candidat
 Con autorización del propietario se activaron `VI_RACE_PUBLIC_BACKUP=true` y `VI_RACE_MAINTENANCE_ENABLED=true` como variables de repositorio (las condiciones `if:` de los jobs no leen variables del entorno). La ejecución manual `45410989396` terminó correctamente: respaldo normalizado de 320.428 bytes verificado por restauración local, 0 publicaciones retiradas, rama `backups` creada sin force push con `daily-2026-11-24.json`, respaldo estático regenerado y Pages desplegado (`c47d5908`).
 
 Pendiente: observar y registrar dos ejecuciones de evento `schedule`. A las 14:11 UTC todavía no había ninguna; GitHub puede tardar en activar la programación de un repositorio nuevo. Una URL pública y ejecuciones manuales no acreditan por sí solas la programación.
+
+## Temporizador de respaldo del monitor (24-11-2026)
+
+El programador de GitHub Actions no lanzó ninguna ejecución `schedule` en las primeras horas. Como respaldo gratuito se añade el Worker `vi-race-cron` (`apps/cron`), con un Cron Trigger de Cloudflare cada 10 minutos. Consulta el último run de `monitor.yml` y solo lo dispara (`workflow_dispatch`) si no hay uno en curso ni otro de hace menos de 8 minutos. No tiene rutas públicas ni acceso a D1.
+
+Lo despliega `deploy.yml`. Necesita el secreto `VI_RACE_DISPATCH_TOKEN` en el entorno `production`: un token fine-grained limitado a este repositorio con permiso **Actions: lectura y escritura**. Sin token, el Worker queda instalado pero inactivo.
