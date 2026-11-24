@@ -1,0 +1,267 @@
+{
+  "schema_version": "1",
+  "evidence": [],
+  "assessments": [],
+  "candidate_reviews": [
+    {
+      "id": "review_candidate_gh_1458949501",
+      "candidate_id": "candidate_gh_1458949501",
+      "status": "rejected",
+      "reason": "Rechazado por alcance: agregador de compatibilidad de emuladores, no una ruta ni un componente de GTA VI en PC. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1463031175",
+      "candidate_id": "candidate_gh_1463031175",
+      "status": "rejected",
+      "reason": "Rechazado: repositorio de perfil de organización sin código que anuncia un instalador o launcher. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464203517",
+      "candidate_id": "candidate_gh_1464203517",
+      "status": "rejected",
+      "reason": "Rechazado: repositorio de perfil de organización sin código que anuncia un instalador o launcher. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464568343",
+      "candidate_id": "candidate_gh_1464568343",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464568369",
+      "candidate_id": "candidate_gh_1464568369",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464568513",
+      "candidate_id": "candidate_gh_1464568513",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464568555",
+      "candidate_id": "candidate_gh_1464568555",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464569209",
+      "candidate_id": "candidate_gh_1464569209",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464569250",
+      "candidate_id": "candidate_gh_1464569250",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464569351",
+      "candidate_id": "candidate_gh_1464569351",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464569631",
+      "candidate_id": "candidate_gh_1464569631",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464569679",
+      "candidate_id": "candidate_gh_1464569679",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464569813",
+      "candidate_id": "candidate_gh_1464569813",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464569982",
+      "candidate_id": "candidate_gh_1464569982",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464570171",
+      "candidate_id": "candidate_gh_1464570171",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464570401",
+      "candidate_id": "candidate_gh_1464570401",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464570420",
+      "candidate_id": "candidate_gh_1464570420",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464570426",
+      "candidate_id": "candidate_gh_1464570426",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464570938",
+      "candidate_id": "candidate_gh_1464570938",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464570978",
+      "candidate_id": "candidate_gh_1464570978",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464646463",
+      "candidate_id": "candidate_gh_1464646463",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464654708",
+      "candidate_id": "candidate_gh_1464654708",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1464657666",
+      "candidate_id": "candidate_gh_1464657666",
+      "status": "rejected",
+      "reason": "Rechazado: una de las 20 copias idénticas de un repositorio de instalador creadas el 19-11-2026 en varias cuentas, sin una ruta técnica verificable. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1467049782",
+      "candidate_id": "candidate_gh_1467049782",
+      "status": "rejected",
+      "reason": "Rechazado: repositorio de perfil de organización sin código que anuncia un instalador o launcher. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1467050985",
+      "candidate_id": "candidate_gh_1467050985",
+      "status": "rejected",
+      "reason": "Rechazado: repositorio de perfil de organización sin código que anuncia un instalador o launcher. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    },
+    {
+      "id": "review_candidate_gh_1470105146",
+      "candidate_id": "candidate_gh_1470105146",
+      "status": "rejected",
+      "reason": "Rechazado: solo contiene un README, sin material técnico; describe streaming remoto, no ejecución en PC. Expediente reviews/dossiers/2026-11-24-radar-inicial.md.",
+      "reviewer": "danieldsh89-dev",
+      "review_commit": "0da9f8cfba8725512b6b41715a4b48b46cf0174e",
+      "occurred_at": "2026-11-24T14:25:00.000Z",
+      "linked_project_id": null
+    }
+  ]
+}
