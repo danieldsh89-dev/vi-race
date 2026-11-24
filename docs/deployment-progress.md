@@ -52,4 +52,8 @@ La ejecución manual `45408605441` de `Verificar recuperación D1` terminó corr
 
 Revisión de solo lectura de D1 producción (24-11-2026, 14:05 UTC): 32 candidatos con metadatos públicos de GitHub (ID, URL, nombre, descripción, consulta y fechas), 3 ejecuciones con commit, métricas y error resumido, estado de descubrimiento con cursor y fechas. `source_state`, `audit_log` y `usage_daily` vacíos. No hay credenciales, correos ni datos personales más allá de nombres de cuentas públicas de GitHub ya visibles en la web. `publish-backup.mjs` vuelve a rechazar patrones de tokens antes de publicar.
 
-Pendiente: activar `VI_RACE_PUBLIC_BACKUP` y `VI_RACE_MAINTENANCE_ENABLED` con autorización del propietario, ejecutar mantenimiento y observar dos ejecuciones programadas. Una URL pública y ejecuciones manuales no acreditan por sí solas la programación.
+## Mantenimiento (verificado)
+
+Con autorización del propietario se activaron `VI_RACE_PUBLIC_BACKUP=true` y `VI_RACE_MAINTENANCE_ENABLED=true` como variables de repositorio (las condiciones `if:` de los jobs no leen variables del entorno). La ejecución manual `45410989396` terminó correctamente: respaldo normalizado de 320.428 bytes verificado por restauración local, 0 publicaciones retiradas, rama `backups` creada sin force push con `daily-2026-11-24.json`, respaldo estático regenerado y Pages desplegado (`c47d5908`).
+
+Pendiente: observar y registrar dos ejecuciones de evento `schedule`. A las 14:11 UTC todavía no había ninguna; GitHub puede tardar en activar la programación de un repositorio nuevo. Una URL pública y ejecuciones manuales no acreditan por sí solas la programación.
