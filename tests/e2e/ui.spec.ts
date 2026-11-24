@@ -91,8 +91,24 @@ test("comparador no mezcla componentes y temas respetan contraste", async ({
     0,
   );
   await page.getByRole("button", { name: "Activar tema claro" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   const result = await new AxeBuilder({ page }).withTags(["wcag2aa"]).analyze();
   expect(result.violations).toEqual([]);
+  for (const path of [
+    "/",
+    "/projects",
+    "/radar",
+    "/methodology",
+    "/sources",
+    "/status",
+  ]) {
+    await page.goto(`${path}?demo=1`);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    const result = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(result.violations).toEqual([]);
+  }
   await page.getByRole("button", { name: "Activar tema oscuro" }).click();
   await page.goto("/?demo=1");
   await page.screenshot({

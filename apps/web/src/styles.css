@@ -17,6 +17,7 @@
   --muted: #a1abbd;
   --border: #2a3142;
   --accent: #bb9bff;
+  --on-accent: #141126;
   --green: #76dec0;
   --amber: #f2ce81;
   color-scheme: dark;
@@ -29,6 +30,7 @@
   --muted: #526078;
   --border: #cdd5e3;
   --accent: #6340b7;
+  --on-accent: #ffffff;
   --green: #166c56;
   --amber: #79550b;
   color: var(--text);
@@ -146,7 +148,7 @@ small {
   font-size: 1.9rem;
   letter-spacing: -0.13em;
   background: var(--accent);
-  color: #141126;
+  color: var(--on-accent);
   border-radius: 6px;
   padding: 0 9px 3px 7px;
   font-style: italic;
@@ -366,7 +368,7 @@ small {
 .primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #151023;
+  color: var(--on-accent);
 }
 .primary:hover {
   filter: brightness(1.08);
@@ -1085,7 +1087,7 @@ footer span {
   left: 15px;
   z-index: 100;
   background: var(--accent);
-  color: #141126;
+  color: var(--on-accent);
   padding: 12px 20px;
 }
 .skip:focus {
