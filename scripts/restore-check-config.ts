@@ -5,6 +5,7 @@ const d = readJson("config/deployment.json") as Record<string, unknown>;
 if (
   !d.restore_check_database_id ||
   d.restore_check_database_id === d.d1_database_id ||
+  d.restore_check_database_id === process.env.CLOUDFLARE_DATABASE_ID ||
   d.restore_check_database_id !== process.env.VI_RACE_RESTORE_DATABASE_ID
 )
   throw new Error("Base de comprobación no registrada");

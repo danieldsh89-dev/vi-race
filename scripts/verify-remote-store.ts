@@ -21,6 +21,7 @@ if (
   process.env.GITHUB_ACTIONS !== "true" ||
   typeof targetId !== "string" ||
   targetId === deployment.d1_database_id ||
+  targetId === process.env.CLOUDFLARE_DATABASE_ID ||
   targetId !== process.env.VI_RACE_RESTORE_DATABASE_ID
 )
   throw new Error(
@@ -30,7 +31,27 @@ const account = process.env.CLOUDFLARE_ACCOUNT_ID;
 const token = process.env.CLOUDFLARE_API_TOKEN;
 if (!account || !token) throw new Error("Faltan credenciales D1");
 const source = openStore(true);
-const target = new D1RestStore(account, targetId, token);
+let guardConstraintObserved = false;
+const target = new D1RestStore(
+  account,
+  targetId,
+  token,
+  async (input, init) => {
+    const response = await fetch(input, init);
+    // Solo esta sonda inspecciona el error SQL. No imprime la respuesta ni credenciales.
+    const body = (await response
+      .clone()
+      .json()
+      .catch(() => null)) as { success?: unknown } | null;
+    if (
+      body &&
+      (body.success === false || !response.ok) &&
+      /CHECK constraint failed:\s*ok\s*=\s*1\b/i.test(JSON.stringify(body))
+    )
+      guardConstraintObserved = true;
+    return response;
+  },
+);
 const local = new LocalStore();
 
 // Clave aleatoria propia: nunca modifica entidades ni el puntero publicado.
@@ -50,6 +71,7 @@ async function verifyRollback(store: SqlStore): Promise<void> {
     if (before[0]?.value_json !== '{"phase":"before"}')
       throw new Error("D1 no confirmó la escritura de control");
     let rejected = false;
+    guardConstraintObserved = false;
     try {
       await store.batch([
         {
@@ -58,7 +80,8 @@ async function verifyRollback(store: SqlStore): Promise<void> {
         },
         { sql: "INSERT INTO write_guards(id,ok) VALUES (?,0)", params: [key] },
       ]);
-    } catch {
+    } catch (error) {
+      if (!guardConstraintObserved) throw error;
       rejected = true;
     }
     const after = await store.query<{ value_json: string }>(
@@ -83,7 +106,8 @@ try {
   local.migrate();
   await restoreBackup(local, backup);
   const expected = await currentPublication(local);
-  if (!expected) throw new Error("El respaldo no contiene una publicación actual");
+  if (!expected)
+    throw new Error("El respaldo no contiene una publicación actual");
   // La guarda del primer statement rechaza destinos con datos. Nunca sobrescribir.
   await target.batch(bootstrapQueries(backup).map((sql) => ({ sql })));
   const copy = await exportBackup(target, backup.generated_at);
