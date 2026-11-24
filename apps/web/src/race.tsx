@@ -92,13 +92,13 @@ export function Sparkline({ data }: { data: number[] }) {
 
 const reachedAt = (x: ProjectView) =>
   x.progress.steps.find((s) => s.step === `P${x.progress.level}`)?.detected_at ?? "9";
-const byRace = (a: ProjectView, b: ProjectView) =>
+export const byRace = (a: ProjectView, b: ProjectView) =>
   b.progress.level - a.progress.level ||
   reachedAt(a).localeCompare(reachedAt(b)) ||
   sum(b.activity_daily) - sum(a.activity_daily) ||
   (b.stats?.stars ?? 0) - (a.stats?.stars ?? 0) ||
   a.name.localeCompare(b.name);
-const sum = (d: number[]) => d.reduce((a, b) => a + b, 0);
+export const sum = (d: number[]) => d.reduce((a, b) => a + b, 0);
 
 export function RaceDashboard({ p, link }: { p: Publication; link: LinkFn }) {
   const routes = p.data.projects

@@ -1774,3 +1774,16 @@ footer span {
     grid-template-columns: minmax(0, 1fr) 70px 24px;
   }
 }
+.card-progress {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 14px;
+}
+.card-progress .score-number strong {
+  font-size: 1.6rem;
+}
+.card-progress + .card-bottom {
+  margin-top: 0;
+}
