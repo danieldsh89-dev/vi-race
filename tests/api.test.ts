@@ -159,7 +159,7 @@ it("no acepta SQL ni rutas arbitrarias", async () => {
   expect(e.prepare).not.toHaveBeenCalled();
 });
 it("limita el cuerpo preparado", async () => {
-  const e = env({ body_json: "x".repeat(256001), body_hash: "a" });
+  const e = env({ body_json: "x".repeat(600001), body_hash: "a" });
   expect(
     (await api.fetch(new Request("https://api.example/api/v1/latest"), e.env))
       .status,

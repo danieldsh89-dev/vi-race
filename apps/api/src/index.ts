@@ -72,7 +72,7 @@ export default {
             ? "Publicación no disponible"
             : "Todavía no hay publicación válida",
         );
-      if (new TextEncoder().encode(row.body_json).length > 256000)
+      if (new TextEncoder().encode(row.body_json).length > 600000)
         return error(503, "invalid_publication", "Publicación no disponible");
       const etag = `"${row.body_hash}"`;
       headers.set("ETag", etag);
