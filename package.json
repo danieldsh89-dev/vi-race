@@ -25,7 +25,8 @@
     "api:dev": "node scripts/wrangler.mjs dev --config apps/api/wrangler.jsonc",
     "api:types": "node scripts/wrangler.mjs types --config apps/api/wrangler.jsonc apps/api/worker-configuration.d.ts --include-runtime=false",
     "api:build": "node scripts/wrangler.mjs deploy --dry-run --config apps/api/wrangler.jsonc --outdir dist/api",
-    "deploy:check": "tsx scripts/deploy-check.ts"
+    "cron:build": "node scripts/wrangler.mjs deploy --dry-run --config apps/cron/wrangler.jsonc --outdir dist/cron",
+    "deploy:check":"tsx scripts/deploy-check.ts"
   },
   "dependencies": {
     "jsonc-parser": "3.3.1",

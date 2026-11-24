@@ -1,0 +1,16 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // Temporizador gratuito de respaldo: dispara el workflow del monitor en
+  // GitHub cada 10 minutos. No tiene rutas públicas ni acceso a D1.
+  "name": "vi-race-cron",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-24",
+  "workers_dev": false,
+  "triggers": { "crons": ["*/10 * * * *"] },
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "vars": {
+    "GH_REPOSITORY": "danieldsh89-dev/vi-race",
+    "GH_WORKFLOW": "monitor.yml",
+    "GH_REF": "main",
+  },
+}

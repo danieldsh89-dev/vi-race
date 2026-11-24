@@ -8,6 +8,7 @@
   "restore_check_database_id": "53de1fa0-dbc7-44cb-832b-b156c455582e",
   "pages_project": "vi-race",
   "site_origin": "https://vi-race.pages.dev",
+  "cron_worker": "vi-race-cron",
   "verified_at": "2026-11-24T13:18:21.321Z",
   "verified_by": "danieldsh89-dev"
 }
