@@ -101,3 +101,9 @@ it("el selector de jugador en pantalla cuenta como primeros gráficos", () => {
   ).map((s) => s.step);
   expect(steps).toEqual(["P3"]);
 });
+it("un siguiente hito es un plan, no un avance", () => {
+  expect(steps("Next milestone: the first frame.", "readme")).toEqual([]);
+  expect(
+    steps("Loading The executable and its DLLs load through the Windows loader;", "readme"),
+  ).toEqual(["P1"]);
+});
