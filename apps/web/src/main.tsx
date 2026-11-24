@@ -412,6 +412,34 @@ function External({
     </a>
   );
 }
+/** URL pública mostrada como texto, sin hipervínculo (política de enlaces). */
+function Reference({ url, label }: { url: string | null; label: string }) {
+  if (!url) return null;
+  return (
+    <small className="reference">
+      {label}: <span className="hash">{url}</span>
+    </small>
+  );
+}
+/** Enlaza solo si el proyecto tiene autorización expresa; si no, texto. */
+function ProjectLink({
+  url,
+  allowed,
+  children,
+}: {
+  url: string | null;
+  allowed: boolean;
+  children: string;
+}) {
+  return allowed ? (
+    <External url={url}>{children}</External>
+  ) : (
+    <Reference url={url} label={children} />
+  );
+}
+const linkable = (p: Publication, projectId: string | null) =>
+  !!projectId &&
+  p.data.projects.some((x) => x.id === projectId && x.link_policy === "link");
 function Tag({
   children,
   tone = "muted",
@@ -630,11 +658,12 @@ function Dashboard({ p, link }: Props) {
                 <p className="muted">
                   Actividad observada. No demuestra por sí sola una capacidad.
                 </p>
-                <External
+                <ProjectLink
                   url={typeof e.payload.url === "string" ? e.payload.url : null}
+                  allowed={linkable(p, e.project_id)}
                 >
-                  Ver fuente
-                </External>
+                  Fuente
+                </ProjectLink>
               </article>
             ))
           ) : (
@@ -844,9 +873,12 @@ function ProjectDetail({ p, link }: Props) {
           <Eyebrow>{labels.types[project.project_type]}</Eyebrow>
           <h1>{project.name}</h1>
           <p>{project.description}</p>
-          <External url={project.official_url}>
+          <ProjectLink
+            url={project.official_url}
+            allowed={project.link_policy === "link"}
+          >
             Fuente oficial del proyecto
-          </External>
+          </ProjectLink>
         </div>
         <div className="detail-score">
           {project.rank === null ? (
@@ -1011,9 +1043,12 @@ function ProjectDetail({ p, link }: Props) {
                 Cadena: {e.provenance_chain} · SHA-256:{" "}
                 <span className="hash">{e.content_hash}</span>
               </small>
-              <External url={e.permalink ?? e.url}>
-                Abrir material original
-              </External>
+              <ProjectLink
+                url={e.permalink ?? e.url}
+                allowed={project.link_policy === "link"}
+              >
+                Material original
+              </ProjectLink>
             </article>
           ))
         ) : (
@@ -1105,7 +1140,7 @@ const statusLabels: Record<Candidate["status"], string> = {
   duplicate: "Duplicado",
   deferred: "Aplazado",
 };
-function CandidateCard({ c, linked }: { c: Candidate; linked: boolean }) {
+function CandidateCard({ c }: { c: Candidate }) {
   return (
     <article className="project-card">
       <Tag tone={c.signals?.length ? "muted" : "amber"}>
@@ -1125,11 +1160,7 @@ function CandidateCard({ c, linked }: { c: Candidate; linked: boolean }) {
         Detectado: {dateTime(c.first_seen_at)} · Visto:{" "}
         {dateTime(c.last_seen_at)}
       </small>
-      {linked ? (
-        <External url={c.canonical_url}>Consultar candidato</External>
-      ) : (
-        <small className="hash">{c.canonical_url}</small>
-      )}
+      <Reference url={c.canonical_url} label="Repositorio" />
     </article>
   );
 }
@@ -1150,15 +1181,16 @@ function RadarPage({ p }: { p: Publication }) {
       <div className="notice subtle">
         Última búsqueda satisfactoria:{" "}
         {dateTime(p.data.discovery_last_success_at)}. La cobertura es limitada;
-        no se presupone exhaustividad. Ningún candidato está verificado: no
-        descargues ni ejecutes nada de estos repositorios.
+        no se presupone exhaustividad. VI Race rastrea estos repositorios sin
+        enlazarlos: muchos dependen de material filtrado o son reclamos. No
+        descargues ni ejecutes nada de ellos.
       </div>
       {p.data.candidates.length ? (
         <>
           {clean.length ? (
             <div className="project-cards">
               {clean.map((c) => (
-                <CandidateCard c={c} linked key={c.id} />
+                <CandidateCard c={c} key={c.id} />
               ))}
             </div>
           ) : (
@@ -1169,13 +1201,10 @@ function RadarPage({ p }: { p: Publication }) {
           )}
           {flagged.length ? (
             <details className="radar-group">
-              <summary>
-                Posibles copias o reclamos ({flagged.length}). Se muestran sin
-                enlace hasta su revisión.
-              </summary>
+              <summary>Posibles copias o reclamos ({flagged.length})</summary>
               <div className="project-cards">
                 {flagged.map((c) => (
-                  <CandidateCard c={c} linked={false} key={c.id} />
+                  <CandidateCard c={c} key={c.id} />
                 ))}
               </div>
             </details>
@@ -1185,11 +1214,7 @@ function RadarPage({ p }: { p: Publication }) {
               <summary>Decisiones registradas ({reviewed.length})</summary>
               <div className="project-cards">
                 {reviewed.map((c) => (
-                  <CandidateCard
-                    c={c}
-                    linked={c.status === "accepted"}
-                    key={c.id}
-                  />
+                  <CandidateCard c={c} key={c.id} />
                 ))}
               </div>
             </details>
@@ -1361,7 +1386,12 @@ function Sources({ p, now }: { p: Publication; now: number }) {
                   fallidos
                 </p>
               )}
-              <External url={s.canonical_url}>Ver fuente</External>
+              <ProjectLink
+                url={s.canonical_url}
+                allowed={linkable(p, s.project_id)}
+              >
+                Fuente
+              </ProjectLink>
               <External url={s.terms_url}>Condiciones de acceso</External>
             </article>
           ))}

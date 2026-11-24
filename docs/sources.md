@@ -16,3 +16,14 @@ Documentación oficial consultada en esta implementación:
 - [Worker: prácticas oficiales](https://developers.cloudflare.com/workers/best-practices/workers-best-practices/).
 
 Estos documentos sustentan la configuración; no acreditan el plan de la cuenta de destino. Al desplegar deben revisarse de nuevo los recursos y cuotas compartidas. No activar sobrecostes ni IA para resolver un límite.
+
+## Política de enlaces
+
+Decisión del propietario (24-11-2026): **rastrear sin enlazar**. Muchas rutas de GTA VI en PC dependen de una compilación filtrada de la versión de Xbox Series, y gran parte de los resultados de búsqueda son reclamos. VI Race observa y documenta estos proyectos, pero la web no los promociona con hipervínculos:
+
+- Radar nunca enlaza candidatos. Muestra la URL del repositorio como texto para que se pueda verificar.
+- Un proyecto admitido se muestra sin enlaces (`link_policy` ausente o `"text_only"`) en ficha, evidencias, fuentes y actividad. Solo `link_policy: "link"`, registrado en revisión, activa los hipervínculos. Requiere comprobar que el proyecto no depende de material filtrado ni lo distribuye.
+- Nunca se publican enlaces, hashes ni instrucciones para obtener material del juego. La versión objetivo se identifica con datos que ya declara el propio proyecto.
+- Si un repositorio se retira por una reclamación, se conserva su historial y se marca como no disponible. No se enlazan copias de rescate ni resubidas.
+
+La API y los respaldos conservan las URL como datos para la trazabilidad. La política se aplica a la presentación.

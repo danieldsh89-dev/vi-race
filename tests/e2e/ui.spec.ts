@@ -56,6 +56,12 @@ test("demo, filtros conservados, ficha, pruebas y método", async ({ page }) => 
     .first()
     .click();
   await expect(page).toHaveURL(/#evidence_fixture/);
+  // Política de enlaces: sin autorización expresa, las URL de material,
+  // fuentes y proyecto se muestran como texto, nunca como hipervínculo.
+  await expect(page.getByText("Material original:").first()).toBeVisible();
+  await expect(page.locator('main a[href^="https://example.com"]')).toHaveCount(
+    0,
+  );
   await page.getByRole("link", { name: /Proyectos \/ Atlas/ }).click();
   await expect(
     page.getByRole("textbox", { name: "Buscar proyectos" }),

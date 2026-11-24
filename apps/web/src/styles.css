@@ -1417,3 +1417,8 @@ footer span {
 .project-card .hash {
   overflow-wrap: anywhere;
 }
+.reference {
+  display: block;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}

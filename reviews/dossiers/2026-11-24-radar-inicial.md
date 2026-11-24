@@ -45,3 +45,5 @@ Una búsqueda manual en la API muestra que las consultas originales no encontrab
 ## Cuestión para el propietario antes de admitir rutas completas
 
 Varios trackers describen estas rutas como ejecución de una **compilación filtrada** de la versión de Xbox Series. Parte de los repositorios originales parece retirada; hay "continuaciones" y archivos de rescate. El documento maestro no fija una política para este caso. Hay que decidir si VI Race enlaza estos proyectos, cómo se identifica la versión objetivo sin enlazar material del juego y qué ocurre con un proyecto retirado por una reclamación. Esta decisión no la toma Claude.
+
+**Resuelto por el propietario el 24-11-2026: rastrear sin enlazar.** Ver "Política de enlaces" en `docs/sources.md`.
