@@ -1,0 +1,6 @@
+# Propietario verificado mediante la sesión GitHub CLI autorizada para VI Race.
+# La protección de rama se configurará al crear el repositorio remoto.
+/config/ @danieldsh89-dev
+/reviews/ @danieldsh89-dev
+/.github/ @danieldsh89-dev
+/packages/domain/ @danieldsh89-dev

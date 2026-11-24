@@ -1,0 +1,156 @@
+{
+  "schema_version": "1",
+  "publication_id": "pub_not_initialized",
+  "generated_at": "2026-11-24T12:15:20.289Z",
+  "last_collection_success_at": null,
+  "mode": "static",
+  "data": {
+    "id": "vi-pc-v1",
+    "version": "1",
+    "milestones": [
+      {
+        "id": "M01",
+        "name": "Alcance y arquitectura técnica definidos",
+        "weight": 3,
+        "criteria": "Documento público coherente que describe objetivo, ruta técnica, plataformas y límites; revisión independiente de consistencia",
+        "dependencies": []
+      },
+      {
+        "id": "M02",
+        "name": "Implementación técnica sustancial e identificable",
+        "weight": 4,
+        "criteria": "Código o material técnico inspeccionable de la ruta declarada, vinculado a una versión; no basta un repositorio vacío o un cambio de nombre",
+        "dependencies": ["M01"]
+      },
+      {
+        "id": "M03",
+        "name": "Construcción del proyecto reproducible",
+        "weight": 4,
+        "criteria": "Instrucciones, dependencias y versión exactas; informe independiente de construcción del componente principal en un entorno identificado",
+        "dependencies": ["M02"]
+      },
+      {
+        "id": "M04",
+        "name": "Carga e identificación de entradas",
+        "weight": 5,
+        "criteria": "Demostración documentada de que reconoce y prepara las entradas necesarias para su ruta; datos aportados de forma autorizada, sin redistribuirlos",
+        "dependencies": ["M02"]
+      },
+      {
+        "id": "M05",
+        "name": "Arranque del flujo objetivo",
+        "weight": 5,
+        "criteria": "Evidencia de inicio del flujo técnico relacionado con el juego, más allá de abrir la interfaz de una herramienta; versión y registros identificados",
+        "dependencies": ["M04"]
+      },
+      {
+        "id": "M06",
+        "name": "Ejecución o traducción de instrucciones viable",
+        "weight": 4,
+        "criteria": "Pruebas de corrección del mecanismo de CPU o de su equivalente nativo; si no necesita traducción, demostrar esa ruta y justificar la equivalencia",
+        "dependencies": ["M02"]
+      },
+      {
+        "id": "M07",
+        "name": "Gestión de memoria y recursos básicos",
+        "weight": 5,
+        "criteria": "Pruebas documentadas de asignación, direccionamiento y ciclo de recursos relevantes, con errores y límites descritos",
+        "dependencies": ["M02"]
+      },
+      {
+        "id": "M08",
+        "name": "Servicios de sistema imprescindibles",
+        "weight": 5,
+        "criteria": "Evidencias de archivos, sincronización, tiempo e hilos que requiere la ruta; pruebas de integración, no solo funciones vacías",
+        "dependencies": ["M02"]
+      },
+      {
+        "id": "M09",
+        "name": "Canal gráfico inicial operativo",
+        "weight": 6,
+        "criteria": "Renderizado real producido por la ruta del proyecto con procedencia y registros; no una imagen precargada ni una interfaz ajena",
+        "dependencies": ["M05"]
+      },
+      {
+        "id": "M10",
+        "name": "Escena o menú del objetivo reconocible",
+        "weight": 6,
+        "criteria": "Escena o menú generado desde el flujo del objetivo y ligado a una versión; contexto suficiente para diferenciarlo de un montaje",
+        "dependencies": ["M09"]
+      },
+      {
+        "id": "M11",
+        "name": "Entrada interactiva funcional",
+        "weight": 5,
+        "criteria": "Acciones de teclado, ratón o mando que afecten de forma observable al entorno ejecutado, con demostración documentada",
+        "dependencies": ["M10"]
+      },
+      {
+        "id": "M12",
+        "name": "Audio integrado",
+        "weight": 5,
+        "criteria": "Audio originado por la ejecución y sincronizado de forma razonable con eventos; límites de cobertura identificados",
+        "dependencies": ["M10"]
+      },
+      {
+        "id": "M13",
+        "name": "Lógica y scripts esenciales",
+        "weight": 5,
+        "criteria": "Ejecución documentada de lógica necesaria para interacciones o secuencias del objetivo; no solo reproducción visual",
+        "dependencies": ["M10"]
+      },
+      {
+        "id": "M14",
+        "name": "Simulación y físicas básicas",
+        "weight": 5,
+        "criteria": "Interacciones con objetos, colisiones o mecanismos equivalentes observables y reproducibles en una escena identificada",
+        "dependencies": ["M11", "M13"]
+      },
+      {
+        "id": "M15",
+        "name": "Mundo y carga progresiva",
+        "weight": 5,
+        "criteria": "Movimiento o transición entre zonas con carga de recursos y continuidad; describir qué parte del mundo se ha comprobado",
+        "dependencies": ["M10", "M07"]
+      },
+      {
+        "id": "M16",
+        "name": "Guardado y recuperación de estado",
+        "weight": 5,
+        "criteria": "Guardar, cerrar y recuperar un estado funcional sobre la misma versión o una compatibilidad documentada",
+        "dependencies": ["M13"]
+      },
+      {
+        "id": "M17",
+        "name": "Estabilidad en sesión definida",
+        "weight": 5,
+        "criteria": "Sesión de al menos 30 minutos con protocolo, entorno, incidencias y registros; sin interrupciones que impidan completar el recorrido acordado",
+        "dependencies": ["M11", "M13", "M15"]
+      },
+      {
+        "id": "M18",
+        "name": "Rendimiento medido y utilizable en el recorrido",
+        "weight": 5,
+        "criteria": "Recorrido de diez minutos a 720p o más, mediana de al menos 30 FPS y percentil 95 de tiempo de cuadro de 66,7 ms o menos; hardware y ajustes publicados",
+        "dependencies": ["M17"]
+      },
+      {
+        "id": "M19",
+        "name": "Reproducción independiente del resultado integrado",
+        "weight": 6,
+        "criteria": "Un tercero reproduce arranque, interacción y recorrido funcional sobre una versión fijada, documentando entorno, pasos y limitaciones",
+        "dependencies": ["M03", "M11", "M17"]
+      },
+      {
+        "id": "M20",
+        "name": "Entrega pública utilizable y trazable",
+        "weight": 7,
+        "criteria": "Versión etiquetada, instrucciones verificables, requisitos, licencia declarada, limitaciones e integridad de artefactos cuando existan; instalación o construcción y recorrido integrado corroborados",
+        "dependencies": ["M16", "M18", "M19"]
+      }
+    ]
+  },
+  "warnings": [
+    "Seguimiento todavía no inicializado. No hay proyectos reales admitidos ni comprobaciones de fuentes registradas."
+  ]
+}

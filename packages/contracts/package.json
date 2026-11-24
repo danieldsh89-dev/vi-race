@@ -1,0 +1,10 @@
+{
+  "exports": {
+    ".": "./src/index.ts",
+    "./publication": "./src/publication.ts"
+  },
+  "name": "@vi/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module"
+}

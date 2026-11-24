@@ -1,0 +1,11 @@
+{
+  "schema_version": "1",
+  "publication_id": "pub_not_initialized",
+  "generated_at": "2026-11-24T12:15:20.289Z",
+  "last_collection_success_at": null,
+  "mode": "static",
+  "data": [],
+  "warnings": [
+    "Seguimiento todavía no inicializado. No hay proyectos reales admitidos ni comprobaciones de fuentes registradas."
+  ]
+}

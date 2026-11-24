@@ -1,0 +1,51 @@
+name: Respaldo diario y mantenimiento
+on:
+  schedule:
+    - cron: "43 3 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: vi-race-writer
+  cancel-in-progress: false
+jobs:
+  maintenance:
+    if: github.event.repository.private == false && vars.VI_RACE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    environment: production
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run deploy:check
+      - run: node scripts/load-backups.mjs
+      - run: npm run maintenance -- --remote
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_DATABASE_ID: ${{ vars.CLOUDFLARE_DATABASE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_DATA_TOKEN }}
+      - run: node scripts/publish-backup.mjs
+        env:
+          VI_RACE_PUBLIC_BACKUP: ${{ vars.VI_RACE_PUBLIC_BACKUP }}
+      - run: npm run export:static -- --remote
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_DATABASE_ID: ${{ vars.CLOUDFLARE_DATABASE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_DATA_TOKEN }}
+      - run: npx vite build --config apps/web/vite.config.ts
+        env:
+          VITE_API_URL: ${{ vars.VI_RACE_API_URL }}
+      - run: npx tsx scripts/budget-check.ts
+      - run: node scripts/wrangler.mjs pages deploy dist/web --project-name "$PAGES_PROJECT" --branch main
+        env:
+          PAGES_PROJECT: ${{ vars.VI_RACE_PAGES_PROJECT }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_DEPLOY_TOKEN }}

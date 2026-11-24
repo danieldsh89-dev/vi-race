@@ -1,0 +1,1 @@
+{"enabled":true,"interval_minutes":60,"max_pages":1,"queries":[{"id":"gta_vi_technical","query":"\"GTA VI\" compatibility"},{"id":"gta6_technical","query":"GTA6 emulator"},{"id":"gta_vi_research","query":"\"Grand Theft Auto VI\" research"}]}
