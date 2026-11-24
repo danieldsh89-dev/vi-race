@@ -32,6 +32,6 @@ export async function getPublication(
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const text = await response.text();
-  if (text.length > 256000) throw new Error("Publicación demasiado grande");
+  if (text.length > 600000) throw new Error("Publicación demasiado grande");
   return parsePublication(JSON.parse(text), demo);
 }
