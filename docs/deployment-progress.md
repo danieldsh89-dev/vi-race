@@ -40,4 +40,16 @@ El despliegue automático `45406513634` exportó datos y compiló correctamente,
 
 Se creó D1 `vi-race-restore-check` (`53de1fa0-dbc7-44cb-832b-b156c455582e`) exclusivamente para un ensayo de recuperación, sin modificar la base publicada. El workflow manual prepara sus migraciones y usa el mismo adaptador REST de producción. El SQL de bootstrap también se expone como lista de statements, conservando los puntos y comas dentro del texto. Las comprobaciones locales actuales pasan: 84 pruebas, tipos y compilación. El resultado remoto del ensayo sigue pendiente.
 
-Pendiente: guardar y comprobar la credencial de despliegue, verificar el rollback remoto y la restauración, ejecutar mantenimiento con respaldo público revisado y observar dos ejecuciones programadas. Una URL pública y un ciclo manual no acreditan por sí solos toda la automatización.
+## Despliegue automático y recuperación remota (verificado)
+
+`CLOUDFLARE_DEPLOY_TOKEN` se guardó en el entorno `production` (13:57 UTC) y se activó `VI_RACE_DEPLOY_ENABLED=true`. La ejecución manual `45408906094` exportó, compiló y publicó Pages correctamente: despliegue `b0192c3b`. Comprobación posterior desde esta sesión: web HTTP 200, API HTTP 200 con la publicación `pub_20261124134501087_0544bebf` y POST rechazado con 405.
+
+La ejecución manual `45408605441` de `Verificar recuperación D1` terminó correctamente sobre `vi-race-restore-check`: rollback de lote fallido verificado, restauración verificada, checksum `ba7f8878…f314ba`, publicación actual coincidente y 0 errores de claves foráneas. Esa base ya no está vacía; un nuevo ensayo exige otro destino vacío.
+
+`last_collection_success_at` es `null` por diseño: solo se calcula con fuentes admitidas y el catálogo real sigue vacío.
+
+## Revisión de campos del respaldo
+
+Revisión de solo lectura de D1 producción (24-11-2026, 14:05 UTC): 32 candidatos con metadatos públicos de GitHub (ID, URL, nombre, descripción, consulta y fechas), 3 ejecuciones con commit, métricas y error resumido, estado de descubrimiento con cursor y fechas. `source_state`, `audit_log` y `usage_daily` vacíos. No hay credenciales, correos ni datos personales más allá de nombres de cuentas públicas de GitHub ya visibles en la web. `publish-backup.mjs` vuelve a rechazar patrones de tokens antes de publicar.
+
+Pendiente: activar `VI_RACE_PUBLIC_BACKUP` y `VI_RACE_MAINTENANCE_ENABLED` con autorización del propietario, ejecutar mantenimiento y observar dos ejecuciones programadas. Una URL pública y ejecuciones manuales no acreditan por sí solas la programación.
