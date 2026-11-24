@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { z } from "zod";
+import { parse } from "jsonc-parser";
 import {
   BudgetsSchema,
   DiscoverySchema,
@@ -13,6 +14,17 @@ import {
 import { validateRubric, validateAssessment } from "@vi/domain";
 export const readJson = (path: string): unknown =>
   JSON.parse(readFileSync(path, "utf8").replace(/^\uFEFF/, ""));
+export function parseJsonc(text: string): unknown {
+  const errors: NonNullable<Parameters<typeof parse>[1]> = [];
+  const value: unknown = parse(text.replace(/^\uFEFF/, ""), errors, {
+    allowTrailingComma: true,
+    disallowComments: false,
+  });
+  if (errors.length) throw new Error("Configuración JSONC inválida");
+  return value;
+}
+export const readJsonc = (path: string): unknown =>
+  parseJsonc(readFileSync(path, "utf8"));
 export function assertProductionInputs(c: {
   projects: { id: string; synthetic?: boolean }[];
   evidence: { id: string; synthetic?: boolean }[];

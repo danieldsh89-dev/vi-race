@@ -1,4 +1,4 @@
-import { readJson, loadConfig } from "./config";
+import { readJson, readJsonc, loadConfig } from "./config";
 export function deploymentCheck() {
   loadConfig();
   const d = readJson("config/deployment.json") as Record<string, unknown>;
@@ -20,7 +20,7 @@ export function deploymentCheck() {
     throw new Error(
       "Faltan recursos propios y origen en config/deployment.json",
     );
-  const w = readJson("apps/api/wrangler.jsonc") as {
+  const w = readJsonc("apps/api/wrangler.jsonc") as {
     d1_databases: { database_id: string }[];
     vars: { ALLOWED_ORIGINS: string };
   };
