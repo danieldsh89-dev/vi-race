@@ -1,6 +1,6 @@
 # Metodología vi-pc-v1
 
-> La vista principal usa la escalera automática vi-avance-v1 (`docs/progress-ladder.md`). Esta rúbrica estricta sigue vigente como auditoría en `/audit`.
+> La vista principal usa la escalera automática vi-avance-v1 (`docs/progress-ladder.md`). Esta rúbrica está retirada de la web; se documenta solo como referencia.
 
 Fuente normativa: sección 11 del documento maestro; la tabla se transcribió literalmente a `config/rubrics/vi-pc-v1.json`. Son 20 hitos, con pesos positivos que suman 100 y dependencias sin ciclos.
 

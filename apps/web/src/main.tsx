@@ -52,6 +52,7 @@ import {
   stepName,
   sum,
 } from "./race";
+import { ladder } from "@vi/progress";
 import "./styles.css";
 const api = import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? "";
 function App() {
@@ -287,20 +288,12 @@ function App() {
               element={<RaceDashboard p={publication} link={link} />}
             />
             <Route
-              path="/audit"
-              element={<Dashboard p={publication} link={link} />}
-            />
-            <Route
               path="/projects"
               element={<Catalog p={publication} link={link} />}
             />
             <Route
               path="/projects/:slug"
               element={<ProjectDetail p={publication} link={link} />}
-            />
-            <Route
-              path="/compare"
-              element={<Compare p={publication} link={link} />}
             />
             <Route path="/radar" element={<RadarPage p={publication} />} />
             <Route
@@ -460,275 +453,6 @@ function Tag({
   tone?: string;
 }) {
   return <span className={`tag ${tone}`}>{children}</span>;
-}
-function ScoreNumber({ project }: { project: ProjectView }) {
-  return (
-    <div className="score-number">
-      <strong>{project.score.score}</strong>
-      <span>/ 100 puntos</span>
-    </div>
-  );
-}
-function ProjectTable({
-  projects,
-  link,
-}: {
-  projects: ProjectView[];
-  link: Props["link"];
-}) {
-  return (
-    <div
-      className="table-wrap"
-      tabIndex={0}
-      role="region"
-      aria-label="Clasificación de proyectos"
-    >
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Posición / Proyecto</th>
-            <th scope="col">Capacidad confirmada</th>
-            <th scope="col">Hitos</th>
-            <th scope="col">Evidencias</th>
-            <th scope="col">Último avance</th>
-          </tr>
-        </thead>
-        <tbody>
-          {projects.map((p) => (
-            <tr key={p.id}>
-              <th scope="row">
-                <Link to={link(`/projects/${p.slug}`)} className="project-name">
-                  <span className="rank">
-                    {p.rank === null ? "—" : String(p.rank).padStart(2, "0")}
-                  </span>
-                  <span className="project-avatar">{p.name.slice(0, 1)}</span>
-                  <span>
-                    {p.name}
-                    <small>{labels.types[p.project_type]}</small>
-                  </span>
-                </Link>
-              </th>
-              <td>
-                {p.rank === null ? (
-                  <span className="muted">Fuera de clasificación</span>
-                ) : (
-                  <ScoreNumber project={p} />
-                )}
-              </td>
-              <td>{p.score.confirmed_count} de 20</td>
-              <td>
-                <span className="icon-text">
-                  <FileCheck2 size={16} />
-                  {p.evidence.length} consultables
-                </span>
-              </td>
-              <td className="muted">{dateTime(p.last_confirmed_at)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-function Dashboard({ p, link }: Props) {
-  const eligible = p.data.projects.filter((p) => p.rank !== null),
-    confirmed = p.data.projects.reduce(
-      (s, p) => s + p.score.confirmed_count,
-      0,
-    ),
-    pending = p.data.candidates.filter(
-      (c) => c.status === "pending_review" && !c.signals?.length,
-    ).length;
-  return (
-    <>
-      <section className="hero">
-        <div>
-          <Eyebrow>
-            <span className="eyebrow-line" /> GTA VI EN PC · OBSERVATORIO
-            COMUNITARIO
-          </Eyebrow>
-          <h1>
-            El avance
-            <br />
-            se <em>demuestra.</em>
-          </h1>
-          <p>
-            Qué proyectos existen, qué han conseguido y qué pruebas lo
-            respaldan. Una carrera de evidencias, con todo a la vista.
-          </p>
-          <div className="hero-actions">
-            <Link className="button primary" to={link("/projects")}>
-              Explorar proyectos
-            </Link>
-            <Link className="button secondary" to={link("/methodology")}>
-              <ShieldCheck size={17} />
-              Cómo evaluamos
-            </Link>
-          </div>
-        </div>
-        <div className="hero-visual" aria-hidden="true">
-          <div className="orbit orbit-one" />
-          <div className="orbit orbit-two" />
-          <div className="orbit orbit-three" />
-          <div className="visual-grid" />
-          <span className="visual-label top">EVIDENCIA VERIFICABLE</span>
-          <div className="visual-monogram">
-            VI<span>RACE</span>
-          </div>
-          <div className="visual-label bottom">
-            <span className="small-square" /> OBSERVAR · CONTRASTAR · EXPLICAR
-          </div>
-        </div>
-      </section>
-      <section className="stats" aria-label="Resumen de seguimiento">
-        {[
-          [
-            Layers3,
-            "Proyectos admitidos",
-            p.data.projects.length,
-            "Identidad y alcance revisados",
-          ],
-          [
-            CheckCircle2,
-            "Hitos confirmados",
-            confirmed,
-            "Respaldados por revisión humana",
-          ],
-          [Radar, "Candidatos en Radar", pending, "Pendientes de comprobar"],
-        ].map(([Icon, title, value, caption]) => {
-          const Symbol = Icon as typeof Layers3;
-          return (
-            <div className="stat" key={String(title)}>
-              <div className="stat-top">
-                <span>{String(title)}</span>
-                <Symbol size={20} />
-              </div>
-              <strong>{String(value).padStart(2, "0")}</strong>
-              <small>{String(caption)}</small>
-            </div>
-          );
-        })}
-      </section>
-      <section className="panel">
-        <div className="section-head">
-          <div>
-            <Eyebrow>LA CARRERA</Eyebrow>
-            <h2>Capacidad técnica confirmada</h2>
-          </div>
-          <Link to={link("/compare")} className="text-button">
-            Comparar proyectos
-          </Link>
-        </div>
-        <p className="section-description">
-          Puntos sobre 100 según la rúbrica vi-pc-v1. No indican cuánto falta
-          para jugar ni una fecha de lanzamiento.
-        </p>
-        {eligible.length ? (
-          <ProjectTable projects={eligible} link={link} />
-        ) : (
-          <Empty
-            title="La carrera empieza con pruebas"
-            detail="Todavía no hay rutas completas admitidas. Publicaremos proyectos cuando su identidad y alcance estén revisados; los puntos llegarán con evidencias."
-            action={
-              <Link className="button secondary" to="/?demo=1">
-                <Eye size={17} />
-                Explorar una demostración ficticia
-              </Link>
-            }
-          />
-        )}
-        <div className="panel-foot">
-          <ShieldCheck size={16} />
-          Las estrellas y los commits no suman puntos. Cada confirmación
-          necesita pruebas y una revisión registrada.
-        </div>
-      </section>
-      <div className="two-column">
-        <section className="panel">
-          <div className="section-head">
-            <div>
-              <Eyebrow>SEÑALES RECIENTES</Eyebrow>
-              <h2>Qué ha cambiado</h2>
-            </div>
-            <Activity size={22} />
-          </div>
-          {p.data.events.length ? (
-            p.data.events.slice(0, 5).map((e) => (
-              <article className="event" key={e.id}>
-                <Tag>{e.event_type}</Tag>
-                <p>
-                  {String(
-                    e.payload.message ??
-                      e.payload.name ??
-                      "Actividad observada",
-                  )}
-                </p>
-                <small>
-                  Detectado: {dateTime(e.observed_at)} · Publicado:{" "}
-                  {dateTime(e.source_published_at)}
-                </small>
-                <p className="muted">
-                  Actividad observada. No demuestra por sí sola una capacidad.
-                </p>
-                <ProjectLink
-                  url={typeof e.payload.url === "string" ? e.payload.url : null}
-                  allowed={linkable(p, e.project_id)}
-                >
-                  Fuente
-                </ProjectLink>
-              </article>
-            ))
-          ) : (
-            <div className="quiet-empty">
-              <Clock3 size={26} />
-              <h3>Sin novedades registradas</h3>
-              <p>Los cambios aparecerán aquí con su fuente, fecha y alcance.</p>
-            </div>
-          )}
-        </section>
-        <section className="panel principles">
-          <Eyebrow>NUESTRO CRITERIO</Eyebrow>
-          <h2>
-            Menos ruido.
-            <br />
-            Más contexto.
-          </h2>
-          {[
-            [
-              Search,
-              "Descubrir",
-              "Localizamos candidatos sin dar por válidas sus afirmaciones.",
-            ],
-            [
-              FileCheck2,
-              "Contrastar",
-              "Separamos una declaración de una prueba reproducible.",
-            ],
-            [
-              ShieldCheck,
-              "Explicar",
-              "Cada punto tiene un motivo, una versión y una fuente.",
-            ],
-          ].map(([Icon, title, body]) => {
-            const Symbol = Icon as typeof Search;
-            return (
-              <div className="principle" key={String(title)}>
-                <Symbol size={20} />
-                <div>
-                  <h3>{String(title)}</h3>
-                  <p>{String(body)}</p>
-                </div>
-              </div>
-            );
-          })}
-          <Link to={link("/methodology")} className="external">
-            Leer la metodología
-            <ChevronRight size={16} />
-          </Link>
-        </section>
-      </div>
-    </>
-  );
 }
 function Catalog({ p, link }: Props) {
   const [params, setParams] = useSearchParams();
@@ -914,7 +638,7 @@ function ProjectDetail({ p, link }: Props) {
           <small>
             {project.rank === null
               ? "Componente: fuera de la carrera"
-              : `${project.score.confirmed_count} de 20 hitos con auditoría`}
+              : stepName(project.progress.level)}
           </small>
         </div>
       </div>
@@ -927,227 +651,6 @@ function ProjectDetail({ p, link }: Props) {
         <span>Comprobado: {dateTime(project.last_checked_at)}</span>
       </div>
       <ProgressPanel project={project} />
-      <div className="two-column">
-        <section className="panel">
-          <Eyebrow>CAPACIDAD DEMOSTRADA</Eyebrow>
-          <h2>{project.score.confirmed_count} hitos con puntos vigentes</h2>
-          <p>
-            {project.score.contributions
-              .filter((c) => c.points > 0)
-              .map(
-                (c) =>
-                  p.data.rubric.milestones.find((m) => m.id === c.id)?.name,
-              )
-              .join(" · ") ||
-              "Sin confirmación suficiente. Esto no demuestra que la capacidad no exista."}
-          </p>
-        </section>
-        <section className="panel">
-          <Eyebrow>PENDIENTE DE VERIFICAR</Eyebrow>
-          <h2>{20 - project.score.confirmed_count} hitos sin contribución</h2>
-          <p>
-            Declaraciones, revisiones y dependencias suspendidas se explican en
-            la tabla. La confianza no multiplica los puntos.
-          </p>
-        </section>
-      </div>
-      <section className="panel">
-        <div className="section-head">
-          <h2>Los 20 hitos</h2>
-          <Tag>vi-pc-v1</Tag>
-        </div>
-        <div
-          className="table-wrap"
-          tabIndex={0}
-          role="region"
-          aria-label="Hitos del proyecto"
-        >
-          <table className="milestones">
-            <thead>
-              <tr>
-                <th scope="col">Hito y criterio</th>
-                <th scope="col">Peso</th>
-                <th scope="col">Estado / contribución</th>
-                <th scope="col">Decisión y pruebas</th>
-              </tr>
-            </thead>
-            <tbody>
-              {p.data.rubric.milestones.map((m) => {
-                const contribution = project.score.contributions.find(
-                    (c) => c.id === m.id,
-                  )!,
-                  assessment = project.assessments.find(
-                    (a) => a.id === contribution.assessment_id,
-                  );
-                return (
-                  <tr key={m.id}>
-                    <th scope="row">
-                      <span className="mono">{m.id}</span> {m.name}
-                      <details>
-                        <summary>Criterio y dependencias</summary>
-                        <p>{m.criteria}</p>
-                        <small>
-                          Requiere: {m.dependencies.join(", ") || "Ninguno"}
-                        </small>
-                      </details>
-                    </th>
-                    <td>{m.weight}</td>
-                    <td>
-                      <Tag
-                        tone={
-                          contribution.points
-                            ? "green"
-                            : contribution.state === "disputed"
-                              ? "amber"
-                              : "muted"
-                        }
-                      >
-                        {labels.states[contribution.state]}
-                      </Tag>
-                      <small>{contribution.points} puntos vigentes</small>
-                    </td>
-                    <td>
-                      <p>{contribution.reason}</p>
-                      {assessment && (
-                        <>
-                          <small>
-                            {assessment.reviewer} · Confianza{" "}
-                            {assessment.confidence} ·{" "}
-                            {dateTime(assessment.recorded_at)}
-                          </small>
-                          {assessment.evidence_ids.map((id) => (
-                            <a
-                              className="evidence-link"
-                              key={id}
-                              href={`#${id}`}
-                            >
-                              Consultar evidencia{" "}
-                              {project.evidence.find((e) => e.id === id)?.level}
-                            </a>
-                          ))}
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
-      <section className="panel">
-        <h2>Evidencias y procedencia</h2>
-        {project.evidence.length ? (
-          project.evidence.map((e) => (
-            <article className="evidence" id={e.id} key={e.id}>
-              <div>
-                <Tag tone={e.level === "E3" ? "green" : "violet"}>
-                  {e.level}
-                </Tag>
-                <Tag>
-                  {e.availability === "withdrawn"
-                    ? "Evidencia retirada"
-                    : e.availability === "unavailable"
-                      ? "Fuente no disponible"
-                      : "Disponible"}
-                </Tag>
-                <Tag>{e.target_version}</Tag>
-              </div>
-              <h3>{e.summary}</h3>
-              <p>Alcance: {e.scope}</p>
-              <p>
-                Limitaciones: {e.limitations.join(" · ") || "No registradas"}
-              </p>
-              <small>
-                Publicado: {dateTime(e.source_published_at)} · Observado:{" "}
-                {dateTime(e.observed_at)} · {e.author}
-              </small>
-              <small>
-                Cadena: {e.provenance_chain} · SHA-256:{" "}
-                <span className="hash">{e.content_hash}</span>
-              </small>
-              <ProjectLink
-                url={e.permalink ?? e.url}
-                allowed={project.link_policy === "link"}
-              >
-                Material original
-              </ProjectLink>
-            </article>
-          ))
-        ) : (
-          <p className="muted">No hay evidencias registradas.</p>
-        )}
-      </section>
-      <div className="two-column">
-        <section className="panel">
-          <h2>Histórico de puntuación</h2>
-          <p>
-            Mejor valor histórico:{" "}
-            {Math.max(0, ...project.history.map((h) => h.score))}/100. Capacidad
-            actual: {project.score.score}/100.
-          </p>
-          {project.history.length ? (
-            <div
-              className="table-wrap"
-              tabIndex={0}
-              role="region"
-              aria-label="Histórico de puntuación"
-            >
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Fecha efectiva</th>
-                    <th scope="col">Puntos</th>
-                    <th scope="col">Rúbrica</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {project.history.map((h) => (
-                    <tr key={h.input_hash}>
-                      <td>{dateTime(h.effective_at)}</td>
-                      <td>{h.score}/100</td>
-                      <td>{h.rubric_id}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p>Sin cambios registrados.</p>
-          )}
-        </section>
-        <section className="panel">
-          <h2>
-            <GitFork size={20} /> Project DNA
-          </h2>
-          {project.relations.length ? (
-            project.relations.map((r) => (
-              <article key={r.id}>
-                <Tag>{r.state === "reviewed" ? "Revisada" : "Propuesta"}</Tag>
-                <p>
-                  {r.relation_type}:{" "}
-                  {
-                    p.data.projects.find(
-                      (p) =>
-                        p.id ===
-                        (r.from_project_id === project.id
-                          ? r.to_project_id
-                          : r.from_project_id),
-                    )?.name
-                  }
-                </p>
-                <p>{r.rationale}</p>
-                <small>Confianza {r.confidence}. No hereda puntos.</small>
-              </article>
-            ))
-          ) : (
-            <p>
-              No hay relaciones comprobadas. La similitud del nombre no
-              demuestra parentesco ni independencia.
-            </p>
-          )}
-        </section>
-      </div>
     </>
   );
 }
@@ -1253,121 +756,72 @@ function RadarPage({ p }: { p: Publication }) {
   );
 }
 function Methodology({ p }: { p: Publication }) {
+  void p;
   return (
     <>
       <PageTitle
-        label="METODOLOGÍA · VI-PC-V1"
-        title="Cada punto tiene que explicarse."
-        description="Medimos capacidad técnica demostrada en una ruta completa de ejecución en PC. Los 100 puntos no son una predicción de éxito ni una fecha de disponibilidad."
+        label="MÉTODO · VI-AVANCE-V1"
+        title="Todo automático, todo a la vista."
+        description="Cómo sabe VI Race hasta dónde llega cada proyecto, sin revisiones manuales."
       />
       <div className="two-column">
         <section className="panel">
           <ShieldCheck className="accent" />
-          <h2>La confirmación es humana</h2>
+          <h2>Qué se lee</h2>
           <p>
-            Un hito suma cuando satisface sus criterios, tiene una demostración
-            E2 y corroboración E3 o una comprobación técnica independiente
-            documentada, y un mantenedor autorizado registra su aprobación.
+            Cada 10 minutos se consulta la API pública de GitHub de cada
+            proyecto: su README, sus versiones publicadas y sus commits en la
+            rama principal. Cada proyecto se vuelve a leer cada 30 minutos.
           </p>
           <p>
-            Si una dependencia pierde confirmación, los hitos que dependen de
-            ella dejan de contribuir. El historial se conserva.
+            No se ejecuta nada de los proyectos, no se descarga el juego y no se
+            enlaza a ningún material filtrado.
           </p>
         </section>
         <section className="panel">
-          <h2>Cuatro niveles de evidencia</h2>
-          {[
-            [
-              "E0",
-              "Declaración",
-              "Una afirmación identificada; no añade puntos.",
-            ],
-            [
-              "E1",
-              "Indicio técnico",
-              "Material parcial para iniciar una revisión.",
-            ],
-            [
-              "E2",
-              "Demostración documentada",
-              "Pruebas específicas sobre una versión y un entorno.",
-            ],
-            [
-              "E3",
-              "Corroboración independiente",
-              "Un tercero documenta una comprobación reproducible.",
-            ],
-          ].map(([id, title, desc]) => (
-            <p key={id}>
-              <Tag tone="violet">{id}</Tag> <strong>{title}</strong>
-              <br />
-              <span className="muted">{desc}</span>
-            </p>
-          ))}
+          <h2>Cómo se detecta un avance</h2>
+          <p>
+            Reglas fijas buscan frases en las que el proyecto anuncia haber
+            alcanzado un paso, como «boots to the title screen» o «first frame».
+            Se descartan los planes, las hojas de ruta, las negaciones («not
+            yet») y las menciones de otros juegos.
+          </p>
+          <p>
+            En los emuladores generales solo cuenta lo que dicen sobre GTA VI.
+            Sin IA y sin intervención humana.
+          </p>
         </section>
       </div>
       <section className="panel">
-        <h2>20 hitos · 100 puntos</h2>
+        <h2>Los 8 pasos</h2>
         <p>
-          Sin puntos parciales. M01 + M02 + M03 = 11 puntos. Los empates
-          comparten posición y los componentes se muestran fuera de la
-          clasificación común.
+          El nivel de un proyecto es el paso más alto que anuncia. Lo que ya
+          anunciaba al empezar el seguimiento es su punto de partida; lo que
+          consigue después aparece como novedad.
         </p>
-        <div
-          className="table-wrap"
-          tabIndex={0}
-          role="region"
-          aria-label="Rúbrica de evaluación"
-        >
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Hito / criterio mínimo</th>
-                <th scope="col">Peso</th>
-                <th scope="col">Dependencias</th>
-              </tr>
-            </thead>
-            <tbody>
-              {p.data.rubric.milestones.map((m) => (
-                <tr key={m.id}>
-                  <td className="mono">{m.id}</td>
-                  <th scope="row">
-                    {m.name}
-                    <details>
-                      <summary>Ver criterio</summary>
-                      <p>{m.criteria}</p>
-                    </details>
-                  </th>
-                  <td>{m.weight}</td>
-                  <td>{m.dependencies.join(", ") || "Ninguna"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ol className="ladder-detail">
+          {ladder.map((s) => (
+            <li key={s.id}>
+              <span className={`step-chip s${s.id.slice(1)}`}>{s.id}</span>
+              <div>
+                <strong>{s.name}</strong>
+                <p className="muted">{s.description}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
       </section>
       <section className="panel">
-        <h2>Estados, incertidumbre y rectificaciones</h2>
-        <div className="tag-list">
-          {Object.entries(labels.states).map(([k, v]) => (
-            <Tag key={k}>{v}</Tag>
-          ))}
-        </div>
+        <h2>Límites</h2>
         <p>
-          «Sin evaluar» indica falta de confirmación suficiente. Una
-          contradicción material suspende puntos y abre revisión. Las decisiones
-          nuevas se añaden al historial; no se borra la corrección anterior.
+          Un paso es lo que <strong>anuncian sus autores</strong>; nadie lo
+          verifica de forma independiente. Lo que solo aparece en ramas o
+          pull requests sin integrar no cuenta hasta que llega a la rama
+          principal.
         </p>
         <p>
-          La confianza baja, media o alta describe la calidad de procedencia y
-          corroboración. No es una probabilidad ni un multiplicador. Varios
-          artículos derivados del mismo anuncio comparten una sola cadena de
-          procedencia.
-        </p>
-        <p>
-          La IA está desactivada. El servicio funciona con reglas y decisiones
-          registradas. Nunca ejecuta software de los proyectos que observa.
+          No existe ninguna versión jugable para descargar. Cualquier descarga
+          que diga ser GTA VI para PC es falsa y puede contener malware.
         </p>
       </section>
     </>
@@ -1530,119 +984,6 @@ function Status({
           </p>
         )}
       </section>
-    </>
-  );
-}
-function Compare({ p, link }: Props) {
-  const [params, setParams] = useSearchParams();
-  const [selected, setSelected] = useState(() =>
-    (params.get("ids") ?? "").split(",").filter(Boolean).slice(0, 3),
-  );
-  useEffect(() => {
-    const sync = () =>
-      setSelected(
-        (new URLSearchParams(window.location.search).get("ids") ?? "")
-          .split(",")
-          .filter(Boolean)
-          .slice(0, 3),
-      );
-    window.addEventListener("popstate", sync);
-    return () => window.removeEventListener("popstate", sync);
-  }, []);
-  const projects = p.data.projects.filter(
-    (p) => selected.includes(p.id) && p.rank !== null,
-  );
-  const toggle = (id: string) => {
-    const next = new URLSearchParams(params),
-      ids = selected.includes(id)
-        ? selected.filter((i) => i !== id)
-        : [...selected, id].slice(0, 3);
-    next.set("ids", ids.join(","));
-    setSelected(ids);
-    setParams(next);
-  };
-  return (
-    <>
-      <PageTitle
-        label="COMPARADOR"
-        title="El mismo criterio. Hasta tres rutas."
-        description="Solo se comparan proyectos admitidos con alcance de ejecución completo. La puntuación no estima cuánto falta para una entrega."
-      />
-      <div className="filters">
-        {p.data.projects
-          .filter((p) => p.rank !== null)
-          .map((p) => (
-            <label className="checkbox" key={p.id}>
-              <input
-                type="checkbox"
-                checked={selected.includes(p.id)}
-                disabled={!selected.includes(p.id) && selected.length >= 3}
-                onChange={() => toggle(p.id)}
-              />
-              {p.name}
-            </label>
-          ))}
-      </div>
-      {projects.length ? (
-        <>
-          <ProjectTable projects={projects} link={link} />
-          <section className="panel">
-            <div
-              className="table-wrap"
-              tabIndex={0}
-              role="region"
-              aria-label="Comparación de hitos"
-            >
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Hito</th>
-                    {projects.map((p) => (
-                      <th scope="col" key={p.id}>
-                        {p.name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {p.data.rubric.milestones.map((m) => (
-                    <tr key={m.id}>
-                      <th scope="row">
-                        {m.id} · {m.name}
-                      </th>
-                      {projects.map((p) => (
-                        <td key={p.id}>
-                          {
-                            labels.states[
-                              p.score.contributions.find((c) => c.id === m.id)!
-                                .state
-                            ]
-                          }{" "}
-                          ·{" "}
-                          {
-                            p.score.contributions.find((c) => c.id === m.id)!
-                              .points
-                          }{" "}
-                          pts.
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </>
-      ) : (
-        <Empty
-          title="Selecciona rutas para compararlas"
-          detail={
-            p.data.projects.length
-              ? "Marca hasta tres proyectos en la lista superior."
-              : "Aún no hay rutas completas admitidas en esta publicación."
-          }
-        />
-      )}
     </>
   );
 }

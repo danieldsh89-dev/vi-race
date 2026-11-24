@@ -12,7 +12,6 @@ for (const width of [360, 768, 1440])
       "/methodology",
       "/sources",
       "/status",
-      "/compare",
     ]) {
       await page.goto(path);
       await expect(page.locator("h1")).toBeVisible();
@@ -57,16 +56,13 @@ test("demo, filtros conservados, ficha, pruebas y método", async ({ page }) => 
   await expect(page.getByText("1 proyectos encontrados")).toBeVisible();
   await page.getByRole("link", { name: /Atlas Runtime/ }).click();
   await expect(
-    page.getByRole("heading", { name: "Los 20 hitos" }),
+    page.getByRole("heading", { name: /P5 · Pantalla de título/ }),
   ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Consultar evidencia E2" })
-    .first()
-    .click();
-  await expect(page).toHaveURL(/#evidence_fixture/);
-  // Política de enlaces: sin autorización expresa, las URL de material,
-  // fuentes y proyecto se muestran como texto, nunca como hipervínculo.
-  await expect(page.getByText("Material original:").first()).toBeVisible();
+  // Política de enlaces: sin autorización expresa, la URL del proyecto se
+  // muestra como texto, nunca como hipervínculo.
+  await expect(
+    page.getByText("Fuente oficial del proyecto:").first(),
+  ).toBeVisible();
   await expect(page.locator('main a[href^="https://example.com"]')).toHaveCount(
     0,
   );
@@ -76,7 +72,7 @@ test("demo, filtros conservados, ficha, pruebas y método", async ({ page }) => 
   ).toHaveValue("Atlas");
   await page.goto("/methodology?demo=1");
   await expect(
-    page.getByRole("heading", { name: "20 hitos · 100 puntos" }),
+    page.getByRole("heading", { name: "Los 8 pasos" }),
   ).toBeVisible();
 });
 test("respaldo sin API y aviso sin conexión", async ({ page, context }) => {
@@ -93,17 +89,8 @@ test("respaldo sin API y aviso sin conexión", async ({ page, context }) => {
   ).toBeVisible();
   await context.setOffline(false);
 });
-test("comparador no mezcla componentes y temas respetan contraste", async ({
-  page,
-}) => {
-  await page.goto("/compare?demo=1");
-  await page.getByRole("checkbox", { name: "Atlas Runtime" }).check();
-  await expect(page).toHaveURL(/ids=project_fixture_atlas/);
-  await page.getByRole("checkbox", { name: "Meridian Bridge" }).check();
-  await expect(page).toHaveURL(/meridian/);
-  await expect(page.getByRole("checkbox", { name: "Prism Trace" })).toHaveCount(
-    0,
-  );
+test("los temas respetan el contraste", async ({ page }) => {
+  await page.goto("/?demo=1");
   await page.getByRole("button", { name: "Activar tema claro" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   const result = await new AxeBuilder({ page }).withTags(["wcag2aa"]).analyze();

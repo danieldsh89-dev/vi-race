@@ -15,7 +15,7 @@ Actualizado: 24-11-2026. Repositorio público: https://github.com/danieldsh89-de
 
 ## Cambio de dirección (24-11-2026)
 
-Decisión del propietario: panel autónomo de avances, sin revisión manual. Portada nueva «La carrera» con la escalera vi-avance-v1 (P1–P8), actividad de 14 días, línea temporal de avances y embudo por paso; 22 proyectos curados y seguimiento automático desde Radar. Detalle en `docs/progress-ladder.md`. La auditoría vi-pc-v1 queda en `/audit`.
+Decisión del propietario: panel autónomo de avances, sin revisión manual. Portada nueva «La carrera» con la escalera vi-avance-v1 (P1–P8), actividad de 14 días, línea temporal de avances y embudo por paso; 22 proyectos curados y seguimiento automático desde Radar. Detalle en `docs/progress-ladder.md`. La auditoría vi-pc-v1 se retiró de la web.
 
 ## Evidencia de este bloque
 
