@@ -228,6 +228,29 @@ it("clasificación automática: motivos precisos y sin rechazar investigación",
   const lure = classify(make("h/gta6-free", "GTA 6 free download for PC"));
   expect(lure.reason).toMatch(/malware/);
 });
+it("clasificación automática: derivados de VIctory sí, otras plataformas no", () => {
+  const make = (name: string, description: string) => ({
+    ...candidate,
+    id: "c_" + name.replace(/\W/g, "_"),
+    provider_repo_id: name,
+    name,
+    description,
+    repo: { stars: 100, size_kb: 5000, language: "Rust", fork: false, pushed_at: null },
+  });
+  expect(classify(make("a/VIctory-V2", "Community-merged fork")).decision).toBe("track");
+  expect(
+    classify(make("b/ztrx", "Run the Xbox Series build of the game natively on Windows PC")).decision,
+  ).toBe("track");
+  for (const [n, d] of [
+    ["c/rpcs3-xbox", "RPCS3 PS3 emulator for Xbox Series"],
+    ["d/decky-xbox", "Decky plugin for the Xbox Series dashboard"],
+    ["e/tiramisu", "Run PC games on Xbox Series in developer mode"],
+    ["f/xllama", "LLM inference on Xbox Series"],
+    ["g/sixng", "Asset extractor for the GTA VI Xbox build"],
+  ])
+    expect(classify(make(n, d)).decision).toBe("reject");
+  expect(classify(make("h/victory-charts", "Charting library")).decision).toBe("pending");
+});
 it("un repositorio ya seguido no se duplica ni se rechaza", () => {
   const c = {
     ...candidate,

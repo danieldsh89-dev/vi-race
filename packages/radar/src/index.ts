@@ -69,8 +69,10 @@ const LURE =
   /\b(installer|install(ation)? (package|guide)|download|free|launcher|beta (edition|for)|leaked (gameplay )?build|fully playable|preload|no bios|dlss ?5|ps5 emulator|setup guide|crack|torrent|apk|repack|mod menu|trainer|cheats?|giveaway|exe released)\b/i;
 /** Términos de trabajo técnico real sobre la versión de consola. */
 const TECHNICAL =
-  /\b(xbox|scarlett|series ?x|gdk|recomp\w*|compatib\w*|runtime|emulat\w*|loader|translation layer|shader|d3d12|rdna ?2|hle|port(ing)?|decomp\w*|reverse[- ]engineer\w*|disassembl\w*|xex|xvd|vulkan)\b/i;
+  /\b(xbox|scarlett|series ?x|gdk|recomp\w*|compatib\w*|runtime|emulat\w*|loader|translation layer|shader|d3d12|rdna ?2|hle|port(ing)?|decomp\w*|reverse[- ]engineer\w*|disassembl\w*|xex|xvd|vulkan|renderer|rendering)\b|\brun(s|ning)?\b.{0,60}\bon (pc|windows)\b|\bnative(ly)?\b.{0,40}\b(pc|windows)\b/i;
 const GTA = /\b(gta ?(vi|6)?|grand theft auto|leonida|vice city)\b/i;
+/** Nombre propio del proyecto VIctory y sus derivados (sensible a mayúsculas). */
+const VICTORY = /VIctory/;
 /** Contenido de fans: mapas, noticias, rastreadores, fondos... no son rutas a PC. */
 const FAN =
   /\b(map|mapa|news|noticias|tracker|countdown|wallpapers?|trailers?|leaks?|rumou?rs?|fan[- ]?(site|made|art|page)|wiki|clips?|screenshots?|concept|discord bot|theme|radio|soundtrack|tribute|landing page|website|portfolio|quiz|predictions?|hub|awesome[- ]list|link list)\b/i;
@@ -79,7 +81,7 @@ const AGGREGATOR =
   /\b(tracker|port[- ]?watch|archive|handbook|does gta vi run on pc|live status|coordination hub|curated list|awesome)\b/i;
 /** Temas ajenos a ejecutar la build de consola en PC. */
 const OFFTOPIC =
-  /\b(remote play|mouse|keyboard|controller|controle|subtit\w*|legendas?|felirat|troubleshoot\w*|performance checker|sales|hype|speedrun|any%|ps5|playstation|multiplayer|roleplay|sa:mp|fivem|wasm)\b|ซับ/i;
+  /\b(remote play|mouse|keyboard|controller|controle|subtit\w*|legendas?|felirat|troubleshoot\w*|performance checker|sales|hype|speedrun|any%|ps5|playstation|multiplayer|roleplay|sa:mp|fivem|wasm|ps3|rpcs3|steam ?deck|decky|dev(eloper)? mode|pc games on xbox|llm|llama|inference|arduino|esp32|asset extractor|extractor)\b|ซับ/i;
 /** Promesas de jugar en PC sin código detrás. */
 const PROMISE = /\b(pc|emulator|play|windows|android|mobile|ios)\b/i;
 const CODE_LANGUAGES = new Set([
@@ -112,7 +114,10 @@ export interface Classification {
  */
 export function classify(c: Candidate): Classification {
   const text = `${c.name} ${c.description}`;
-  const technical = TECHNICAL.test(c.description) || /recomp|decomp|runtime/i.test(c.name);
+  const technical =
+    TECHNICAL.test(c.description) ||
+    /recomp|decomp|runtime/i.test(c.name) ||
+    VICTORY.test(c.name);
   if (c.signals?.length)
     return {
       decision: "reject",
@@ -173,7 +178,7 @@ export function classify(c: Candidate): Classification {
     r.stars >= AUTO_TRACK.min_stars &&
     r.size_kb >= AUTO_TRACK.min_size_kb &&
     technical &&
-    (GTA.test(text) || /\bxbox series|scarlett\b/i.test(text))
+    (GTA.test(text) || VICTORY.test(text) || /\bxbox series|scarlett\b/i.test(text))
   )
     return {
       decision: "track",

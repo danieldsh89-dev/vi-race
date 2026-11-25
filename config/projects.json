@@ -17,6 +17,21 @@
       "updated_at": "2026-11-24T16:00:00.000Z"
     },
     {
+      "id": "project_victory_fork",
+      "slug": "victory-fork",
+      "name": "victory-fork",
+      "description": "Bifurcación de trabajo de VIctory, con parches propios y algunas ideas de XCL, centrada en que el mundo se dibuje y se pueda jugar.",
+      "project_type": "full_route",
+      "category": "Capa de compatibilidad",
+      "review_status": "accepted",
+      "maintenance_status": "active",
+      "ranking_eligible": true,
+      "official_url": "https://github.com/fxceless/victory-fork",
+      "title_scope": "gta_vi",
+      "created_at": "2026-11-24T16:00:00.000Z",
+      "updated_at": "2026-11-24T16:00:00.000Z"
+    },
+    {
       "id": "project_xcl",
       "slug": "xcl",
       "name": "XCL",
@@ -42,7 +57,7 @@
       "project_type": "full_route",
       "category": "Capa de compatibilidad",
       "review_status": "accepted",
-      "maintenance_status": "active",
+      "maintenance_status": "archived",
       "ranking_eligible": true,
       "official_url": "https://github.com/fablinoo/palmwave",
       "title_scope": "gta_vi",
@@ -403,6 +418,7 @@
   ],
   "target_versions": {
     "project_victory": "Xbox Series (build pública)",
+    "project_victory_fork": "Xbox Series (build pública)",
     "project_xcl": "Xbox Series (build pública)",
     "project_palmwave": "Xbox Series (build pública)",
     "project_bathyal": "Xbox Series (build pública)",
