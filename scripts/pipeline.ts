@@ -952,54 +952,8 @@ export async function runCycle(
   await saveRun();
   const errors: string[] = [];
   try {
-    for (const source of c.sources
-      .filter((s) => s.enabled && c.features.github_enabled)
-      .sort((a, b) => a.priority.localeCompare(b.priority))) {
-      if (Date.now() - start > (c.budgets.max_job_seconds - 30) * 1000) {
-        errors.push("time_budget");
-        break;
-      }
-      const state = (
-        await readEntities<SourceState>(store, "source_state")
-      ).find((s) => s.source_id === source.id)!;
-      if (state.next_due_at > now) continue;
-      try {
-        // Reglas de detección nuevas: se vuelve a pedir el README sin ETag.
-        const rules = source.project_id
-          ? ((await readProgress(store, source.project_id)).rules ?? 1)
-          : RULES_VERSION;
-        const collected = await client.collect(
-          source,
-          rules < RULES_VERSION ? { ...state, readme_etag: null } : state,
-          now,
-        );
-        const prepared = await prepareCollection(
-          store,
-          c.projects.find((p) => p.id === source.project_id),
-          collected,
-          now,
-        );
-        await persistCollection(store, state, prepared.result, prepared.extras);
-      } catch (e) {
-        if (!(e instanceof CollectionError)) throw e;
-        const code = e.code;
-        errors.push(`${source.id}:${code}`);
-        const failed = {
-          ...state,
-          last_checked_at: now,
-          failure_count: state.failure_count + 1,
-          last_error_code: code,
-          next_due_at:
-            e instanceof CollectionError && e.retry_at
-              ? e.retry_at
-              : new Date(
-                  Date.parse(now) + source.interval_minutes * 60000,
-                ).toISOString(),
-        };
-        await persistFailure(store, state, failed);
-        if (["rate_limited", "budget_exhausted"].includes(code)) break;
-      }
-    }
+    // El Radar va primero: gasta pocas peticiones (una por búsqueda) y, si fuera
+    // detrás, las fuentes agotarían el presupuesto y nunca llegaría a ejecutarse.
     const discoveryState = (
       await store.query<{ value_json: string }>(
         "SELECT value_json FROM pipeline_state WHERE key='discovery'",
@@ -1102,6 +1056,54 @@ export async function runCycle(
             "update",
           ),
         ]);
+      }
+    }
+    for (const source of c.sources
+      .filter((s) => s.enabled && c.features.github_enabled)
+      .sort((a, b) => a.priority.localeCompare(b.priority))) {
+      if (Date.now() - start > (c.budgets.max_job_seconds - 30) * 1000) {
+        errors.push("time_budget");
+        break;
+      }
+      const state = (
+        await readEntities<SourceState>(store, "source_state")
+      ).find((s) => s.source_id === source.id)!;
+      if (state.next_due_at > now) continue;
+      try {
+        // Reglas de detección nuevas: se vuelve a pedir el README sin ETag.
+        const rules = source.project_id
+          ? ((await readProgress(store, source.project_id)).rules ?? 1)
+          : RULES_VERSION;
+        const collected = await client.collect(
+          source,
+          rules < RULES_VERSION ? { ...state, readme_etag: null } : state,
+          now,
+        );
+        const prepared = await prepareCollection(
+          store,
+          c.projects.find((p) => p.id === source.project_id),
+          collected,
+          now,
+        );
+        await persistCollection(store, state, prepared.result, prepared.extras);
+      } catch (e) {
+        if (!(e instanceof CollectionError)) throw e;
+        const code = e.code;
+        errors.push(`${source.id}:${code}`);
+        const failed = {
+          ...state,
+          last_checked_at: now,
+          failure_count: state.failure_count + 1,
+          last_error_code: code,
+          next_due_at:
+            e instanceof CollectionError && e.retry_at
+              ? e.retry_at
+              : new Date(
+                  Date.parse(now) + source.interval_minutes * 60000,
+                ).toISOString(),
+        };
+        await persistFailure(store, state, failed);
+        if (["rate_limited", "budget_exhausted"].includes(code)) break;
       }
     }
     for (const review of c.candidateReviews) {
