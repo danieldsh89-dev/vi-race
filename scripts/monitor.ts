@@ -19,11 +19,13 @@ try {
     }),
   );
   // Agotar el presupuesto por ciclo es normal con muchos proyectos: el resto
-  // se recoge en el siguiente ciclo. Solo fallan los errores reales.
+  // se recoge en el siguiente ciclo. Un repositorio borrado (not_found) o
+  // recreado con otra identidad (identity_mismatch) queda marcado en su fuente
+  // y no debe tumbar el ciclo entero. Solo fallan los errores reales.
   const real = (result.run.error_summary ?? "")
     .split("; ")
     .filter(
-      (e) => e && !/:(budget_exhausted|time_budget|not_found)$|^time_budget$/.test(e),
+      (e) => e && !/:(budget_exhausted|time_budget|not_found|identity_mismatch)$|^time_budget$/.test(e),
     );
   if (result.run.status === "failed" || real.length) process.exitCode = 1;
 } finally {

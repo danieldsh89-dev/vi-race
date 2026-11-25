@@ -15,6 +15,19 @@
       "access_notes": "API REST pública de GitHub: metadatos, commits, versiones y README. Sin descargar ni ejecutar código."
     },
     {
+      "id": "source_gh_1470579726",
+      "project_id": "project_victory_fork",
+      "adapter": "github",
+      "repository": "fxceless/victory-fork",
+      "provider_repo_id": "1470579726",
+      "enabled": true,
+      "priority": "primary",
+      "interval_minutes": 30,
+      "canonical_url": "https://github.com/fxceless/victory-fork",
+      "terms_url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+      "access_notes": "API REST pública de GitHub: metadatos, commits, versiones y README. Sin descargar ni ejecutar código."
+    },
+    {
       "id": "source_gh_1465852099",
       "project_id": "project_xcl",
       "adapter": "github",
@@ -33,7 +46,7 @@
       "adapter": "github",
       "repository": "fablinoo/palmwave",
       "provider_repo_id": "1469149939",
-      "enabled": true,
+      "enabled": false,
       "priority": "primary",
       "interval_minutes": 30,
       "canonical_url": "https://github.com/fablinoo/palmwave",
@@ -106,11 +119,11 @@
       "access_notes": "API REST pública de GitHub: metadatos, commits, versiones y README. Sin descargar ni ejecutar código."
     },
     {
-      "id": "source_gh_1469399953",
+      "id": "source_gh_1470900252",
       "project_id": "project_palmetto",
       "adapter": "github",
       "repository": "luizwidmer/palmetto",
-      "provider_repo_id": "1469399953",
+      "provider_repo_id": "1470900252",
       "enabled": true,
       "priority": "primary",
       "interval_minutes": 30,
