@@ -192,3 +192,35 @@ it("el Radar se ejecuta antes que las fuentes y no se queda sin presupuesto", as
   )[0];
   expect(JSON.parse(row.value_json).last_success_at).toBe(now);
 });
+it("un candidato de seguimiento automático no rompe la clave ajena y entra en el siguiente ciclo", async () => {
+  const store = new LocalStore();
+  store.migrate();
+  const { demoPublication } = await import("./fixtures/demo");
+  const base = demoPublication(config.rubric).data.candidates[0];
+  const found = {
+    ...base,
+    id: "candidate_gh_999000111",
+    provider_repo_id: "999000111",
+    name: "someone/VIctory-V2",
+    canonical_url: "https://github.com/someone/VIctory-V2",
+    description: "Community-merged fork of VIctory",
+    status: "pending_review" as const,
+    linked_project_id: null,
+    repo: { stars: 100, size_kb: 5000, language: "Rust", fork: false, pushed_at: null },
+  };
+  const client = {
+    requests: 0,
+    discover: async () => [found],
+    collect: async () => {
+      throw new (await import("@vi/collectors")).CollectionError("budget_exhausted");
+    },
+  } as unknown as GitHubClient;
+  const c = { ...config, sources: config.sources.map((s) => ({ ...s, enabled: false })) };
+  const first = await runCycle(store, c, client, now);
+  expect(first.run.error_summary).toBeNull();
+  const later = new Date(Date.parse(now) + 31 * 60000).toISOString();
+  const second = await runCycle(store, c, client, later);
+  expect(
+    second.publication.data.projects.some((p) => p.id === "project_auto_999000111"),
+  ).toBe(true);
+});

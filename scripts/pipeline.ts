@@ -1007,7 +1007,14 @@ export async function runCycle(
               status: candidate.status,
               first_seen_at: candidate.first_seen_at,
               last_seen_at: candidate.last_seen_at,
-              linked_project_id: candidate.linked_project_id,
+              // Un proyecto de seguimiento automático recién decidido aún no
+              // existe en la tabla: la columna (clave ajena) queda vacía hasta
+              // el siguiente ciclo; el enlace se conserva en payload_json.
+              linked_project_id:
+                candidate.linked_project_id &&
+                c.projects.some((p) => p.id === candidate.linked_project_id)
+                  ? candidate.linked_project_id
+                  : null,
               payload_json: JSON.stringify(candidate),
             },
             "update",
@@ -1033,6 +1040,8 @@ export async function runCycle(
         );
         await store.batch(statements);
       } catch (e) {
+        if (!(e instanceof CollectionError))
+          console.error("discovery:", e instanceof Error ? e.message : e);
         errors.push(
           `discovery:${e instanceof CollectionError ? e.code : "failed"}`,
         );
