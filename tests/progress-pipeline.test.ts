@@ -167,3 +167,28 @@ it("lo anunciado al empezar es punto de partida; lo posterior es novedad", async
   expect(after.steps.P5?.baseline).toBeUndefined();
   store.close();
 });
+it("el Radar se ejecuta antes que las fuentes y no se queda sin presupuesto", async () => {
+  const store = new LocalStore();
+  store.migrate();
+  const { CollectionError } = await import("@vi/collectors");
+  const calls: string[] = [];
+  const client = {
+    requests: 0,
+    async discover() {
+      calls.push("discover");
+      return [];
+    },
+    async collect() {
+      calls.push("collect");
+      throw new CollectionError("budget_exhausted");
+    },
+  } as unknown as GitHubClient;
+  await runCycle(store, config, client, now);
+  expect(calls[0]).toBe("discover");
+  const row = (
+    await store.query<{ value_json: string }>(
+      "SELECT value_json FROM pipeline_state WHERE key='discovery'",
+    )
+  )[0];
+  expect(JSON.parse(row.value_json).last_success_at).toBe(now);
+});
